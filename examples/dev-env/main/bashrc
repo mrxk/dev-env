@@ -1,0 +1,10 @@
+source /etc/bash.bashrc
+
+if [ "${TMUX}" != "" ]
+then
+    export $(tmux show-environment PATH)
+    export $(tmux show-environment GOOS)
+    export $(tmux show-environment GOARCH)
+    export $(tmux show-environment GOARM)
+fi
+

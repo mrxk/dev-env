@@ -1,0 +1,12 @@
+{
+    "envs": {
+        "main": {
+            "containerArgs": [
+                "--cpuset-cpus", "1,3",
+		"-v", "$HOME/.ssh:/home/user1/.ssh"
+            ],
+            "name": "nervous_golick"
+        }
+    }
+}
+
