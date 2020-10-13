@@ -156,7 +156,8 @@ func GetConfigDir() (string, error) {
 	if err != nil {
 		return "", nil
 	}
-	configDir := filepath.Join(cwd, ConfigDir)
+	path := findProjectRoot(cwd)
+	configDir := filepath.Join(path, ConfigDir)
 	err = os.MkdirAll(configDir, 0700)
 	if err != nil {
 		return "", err
@@ -187,4 +188,26 @@ func WriteConfigFileIfNotExist(dir, filename string, content []byte) error {
 		return err
 	}
 	return nil
+}
+
+func findProjectRoot(path string) string {
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return path
+	}
+	absPath = filepath.Clean(absPath)
+	for absPath != string(filepath.Separator) && absPath != "." {
+		candidateProjectRoot := filepath.Join(absPath, ConfigDir)
+		_, err = os.Stat(candidateProjectRoot)
+		if err == nil {
+			return absPath
+		}
+		absPath = filepath.Dir(absPath)
+	}
+	candidateProjectRoot := filepath.Join(absPath, ConfigDir)
+	_, err = os.Stat(candidateProjectRoot)
+	if err == nil {
+		return absPath
+	}
+	return path
 }
