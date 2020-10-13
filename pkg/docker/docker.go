@@ -9,14 +9,14 @@ import (
 )
 
 func BuildImage(env *config.Env) error {
-	configDir, err := env.ConfigDir()
+	dockerConfigDir, err := env.DockerBuildDir()
 	if err != nil {
 		return err
 	}
 	imageNameAndTag := env.ImageNameAndTag()
 	dockerArgs := []string{
 		"build",
-		configDir,
+		dockerConfigDir,
 		"-t",
 		imageNameAndTag,
 	}

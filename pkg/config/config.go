@@ -23,9 +23,9 @@ type Config struct {
 }
 
 type Env struct {
-	ContainerArgs []string `json:"containerArgs"`
-	Name          string   `json:"name"`
-	configDir     string
+	ContainerArgs  []string `json:"containerArgs"`
+	Name           string   `json:"name"`
+	dockerBuildDir string
 }
 
 func NewConfig() (Config, error) {
@@ -33,8 +33,8 @@ func NewConfig() (Config, error) {
 		Version: "1",
 		Envs: map[string]*Env{
 			"main": {
-				Name:      namesgenerator.GetRandomName(0),
-				configDir: "main",
+				Name:           namesgenerator.GetRandomName(0),
+				dockerBuildDir: "main",
 			},
 		},
 	}
@@ -66,7 +66,7 @@ func (c *Config) Read() error {
 		return fmt.Errorf("Unknown config version: %s", c.Version)
 	}
 	for dir, env := range c.Envs {
-		env.configDir = dir
+		env.dockerBuildDir = dir
 	}
 	return nil
 }
@@ -109,12 +109,12 @@ func (c *Config) write(force bool) error {
 	return ioutil.WriteFile(datapath, data, 0600)
 }
 
-func (e *Env) ConfigDir() (string, error) {
+func (e *Env) DockerBuildDir() (string, error) {
 	root, err := GetConfigDir()
 	if err != nil {
 		return "", err
 	}
-	path := filepath.Join(root, e.configDir)
+	path := filepath.Join(root, e.dockerBuildDir)
 	err = os.MkdirAll(path, 0700)
 	if err != nil {
 		return "", err
@@ -132,9 +132,9 @@ func (e *Env) ContainerName() string {
 
 func (e *Env) WithName(name string) *Env {
 	newEnv := &Env{
-		ContainerArgs: make([]string, len(e.ContainerArgs)),
-		Name:          name,
-		configDir:     e.configDir,
+		ContainerArgs:  make([]string, len(e.ContainerArgs)),
+		Name:           name,
+		dockerBuildDir: e.dockerBuildDir,
 	}
 	copy(newEnv.ContainerArgs, e.ContainerArgs)
 	return newEnv
@@ -142,9 +142,9 @@ func (e *Env) WithName(name string) *Env {
 
 func (e *Env) WithContainerArgs(containerArgs []string) *Env {
 	newEnv := &Env{
-		ContainerArgs: make([]string, 0, len(e.ContainerArgs)+len(containerArgs)),
-		Name:          e.Name,
-		configDir:     e.configDir,
+		ContainerArgs:  make([]string, 0, len(e.ContainerArgs)+len(containerArgs)),
+		Name:           e.Name,
+		dockerBuildDir: e.dockerBuildDir,
 	}
 	newEnv.ContainerArgs = append(newEnv.ContainerArgs, e.ContainerArgs...)
 	newEnv.ContainerArgs = append(newEnv.ContainerArgs, containerArgs...)
