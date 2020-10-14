@@ -59,13 +59,14 @@ func CreateContainer(env *config.Env, cmdArgs []string) error {
 	if err != nil {
 		return err
 	}
+	projectRoot := config.GetProjectRoot(cwd)
 	containerName := env.ContainerName()
 	dockerArgs := []string{
 		"create",
 		"-i",
 		"-t",
 		"-v",
-		cwd + ":/src",
+		projectRoot + ":/src",
 		"-w",
 		"/src",
 		"--name",

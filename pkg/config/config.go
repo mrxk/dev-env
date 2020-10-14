@@ -156,7 +156,7 @@ func GetConfigDir() (string, error) {
 	if err != nil {
 		return "", nil
 	}
-	path := findProjectRoot(cwd)
+	path := GetProjectRoot(cwd)
 	configDir := filepath.Join(path, ConfigDir)
 	err = os.MkdirAll(configDir, 0700)
 	if err != nil {
@@ -190,7 +190,7 @@ func WriteConfigFileIfNotExist(dir, filename string, content []byte) error {
 	return nil
 }
 
-func findProjectRoot(path string) string {
+func GetProjectRoot(path string) string {
 	candidatePath, err := filepath.Abs(path)
 	if err != nil {
 		return path
