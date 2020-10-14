@@ -191,23 +191,22 @@ func WriteConfigFileIfNotExist(dir, filename string, content []byte) error {
 }
 
 func findProjectRoot(path string) string {
-	absPath, err := filepath.Abs(path)
+	candidatePath, err := filepath.Abs(path)
 	if err != nil {
 		return path
 	}
-	absPath = filepath.Clean(absPath)
-	for absPath != string(filepath.Separator) && absPath != "." {
-		candidateProjectRoot := filepath.Join(absPath, ConfigDir)
+	candidatePath = filepath.Clean(candidatePath)
+	for {
+		candidateProjectRoot := filepath.Join(candidatePath, ConfigDir)
 		_, err = os.Stat(candidateProjectRoot)
 		if err == nil {
-			return absPath
+			return candidatePath
 		}
-		absPath = filepath.Dir(absPath)
-	}
-	candidateProjectRoot := filepath.Join(absPath, ConfigDir)
-	_, err = os.Stat(candidateProjectRoot)
-	if err == nil {
-		return absPath
+		parentPath := filepath.Dir(candidatePath)
+		if candidatePath == parentPath {
+			break
+		}
+		candidatePath = parentPath
 	}
 	return path
 }
