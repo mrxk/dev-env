@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/mrxk/dev-env/pkg/config"
 	"github.com/mrxk/dev-env/pkg/docker"
 	"github.com/spf13/cobra"
 )
@@ -10,15 +11,7 @@ func RemoveImage(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	err = docker.RemoveContainer(env)
-	if err != nil {
-		return err
-	}
-	err = docker.RemoveImage(env)
-	if err != nil {
-		return err
-	}
-	return nil
+	return removeImage(env)
 }
 
 func RemoveRImage(cmd *cobra.Command, _ []string) error {
@@ -26,14 +19,26 @@ func RemoveRImage(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name + "_r")
-	err = docker.RemoveContainer(runEnv)
+	return removeImage(env.WithName(env.Name + "_r"))
+}
+
+func RemoveSImage(cmd *cobra.Command, _ []string) error {
+	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
-	err = docker.RemoveImage(runEnv)
+	spawnEnv := env.WithName(env.Name + "_spawn")
+	err = docker.StopContainer(spawnEnv)
 	if err != nil {
 		return err
 	}
-	return nil
+	return removeImage(spawnEnv)
+}
+
+func removeImage(env *config.Env) error {
+	err := docker.RemoveContainer(env)
+	if err != nil {
+		return err
+	}
+	return docker.RemoveImage(env)
 }

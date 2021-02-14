@@ -10,11 +10,7 @@ func RemoveContainer(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	err = docker.RemoveContainer(env)
-	if err != nil {
-		return err
-	}
-	return nil
+	return docker.RemoveContainer(env)
 }
 
 func RemoveRContainer(cmd *cobra.Command, _ []string) error {
@@ -23,9 +19,18 @@ func RemoveRContainer(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	runEnv := env.WithName(env.Name + "_r")
-	err = docker.RemoveContainer(runEnv)
+	return docker.RemoveContainer(runEnv)
+}
+
+func RemoveSContainer(cmd *cobra.Command, _ []string) error {
+	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
-	return nil
+	spawnEnv := env.WithName(env.Name + "_spawn")
+	err = docker.StopContainer(spawnEnv)
+	if err != nil {
+		return err
+	}
+	return docker.RemoveContainer(spawnEnv)
 }

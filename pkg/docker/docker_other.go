@@ -26,9 +26,24 @@ func StartContainer(env *config.Env, interactive bool) error {
 		return err
 	}
 	fmt.Println(dockerArgs)
-	err = syscall.Exec(dockerBinary, dockerArgs, os.Environ())
+	return syscall.Exec(dockerBinary, dockerArgs, os.Environ())
+}
+
+func ExecContainer(env *config.Env, args []string, interactive bool) error {
+	dockerArgs := []string{
+		"docker",
+		"exec",
+	}
+	if !interactive {
+		dockerArgs = append(dockerArgs, "-d")
+	}
+	containerName := env.ContainerName()
+	dockerArgs = append(dockerArgs, containerName)
+	dockerArgs = append(dockerArgs, args...)
+	dockerBinary, err := exec.LookPath("docker")
 	if err != nil {
 		return err
 	}
-	return nil
+	fmt.Println(dockerArgs)
+	return syscall.Exec(dockerBinary, dockerArgs, os.Environ())
 }

@@ -54,6 +54,18 @@ func ContainerExists(env *config.Env) bool {
 	return len(output) != 0
 }
 
+func ContainerRunning(env *config.Env) bool {
+	containerName := env.ContainerName()
+	filter := fmt.Sprintf("name=^%s$", containerName)
+	dockerCommand := exec.Command("docker", "ps", "-q", "-f", filter)
+	output, err := dockerCommand.CombinedOutput()
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return false
+	}
+	return len(output) != 0
+}
+
 func CreateContainer(env *config.Env, cmdArgs []string) error {
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -168,4 +180,48 @@ func RemoveImage(env *config.Env) error {
 		return err
 	}
 	return nil
+}
+
+func SpawnContainer(env *config.Env) error {
+	containerName := env.ContainerName()
+	dockerArgs := []string{
+		"start",
+		containerName,
+	}
+	fmt.Println(append([]string{"docker"}, dockerArgs...))
+	dockerCommand := exec.Command("docker", dockerArgs...)
+	dockerCommand.Stdout = os.Stdout
+	dockerCommand.Stderr = os.Stderr
+	err := dockerCommand.Start()
+	if err != nil {
+		return err
+	}
+	return dockerCommand.Wait()
+}
+
+func SpawnContainerIfNotRunning(env *config.Env) error {
+	if ContainerRunning(env) {
+		return nil
+	}
+	return SpawnContainer(env)
+}
+
+func StopContainer(env *config.Env) error {
+	if !ContainerExists(env) {
+		return nil
+	}
+	containerName := env.ContainerName()
+	dockerArgs := []string{
+		"stop",
+		containerName,
+	}
+	fmt.Println(append([]string{"docker"}, dockerArgs...))
+	dockerCommand := exec.Command("docker", dockerArgs...)
+	dockerCommand.Stdout = os.Stdout
+	dockerCommand.Stderr = os.Stderr
+	err := dockerCommand.Start()
+	if err != nil {
+		return err
+	}
+	return dockerCommand.Wait()
 }

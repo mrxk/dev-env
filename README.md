@@ -31,13 +31,17 @@ Usage:
 Available Commands:
   build       Build a dev-env image in the current directory
   connect     Start or connect to a dev-env container in the current directory
+  exec        Exec a command via bash in a spawned dev-env container in the current directory
   help        Help about any command
   init        Initialize a dev-env in the current directory
   rm          Remove a dev-env container in the current directory
-  rmi         Destroy a dev-env container and image in the current directory
+  rmi         Remove a dev-env container and its associated image in the current directory
   rmr         Remove a run dev-env container in the current directory
-  rmri        Destroy a run dev-env container and image in the current directory
+  rmri        Remove a run dev-env container and its associated image in the current directory
+  rms         Remove a spawn dev-env container in the current directory
+  rmsi        Remove a spawn dev-env container and its associated image in the current directory
   run         Run a command via bash in a dev-env container in the current directory
+  spawn       Spawn a detached dev-env container in the current directory
 
 Flags:
   -e, --env string   environment to use (default "main")
@@ -69,7 +73,8 @@ Each environment in the `envs` array is an object with the following fields.
 Dev-env expects to find a directory in `.dev-env` named the same as each key in
 the `envs` field in the config file. This directory is expected to contain a
 `Dockerfile` and is the directory within which `docker build` will be run to
-create the container.
+create the container. The resulting image must contain functional `bash` and
+`tail` commands.
 
 ### Example config file
 
@@ -90,25 +95,71 @@ create the container.
 
 ## Details
 
-Dev-env supports two styles of development environment management.  The
-`connect` command creates an image (if one does not already exist) from the
+Dev-env supports three styles of development environment management.
+
+### Connect style
+
+The following commands work together to manage a persistent interactive shell
+environment.
+
+ * build: Build a dev-env image in the current directory
+ * connect: Start or connect to a dev-env container in the current directory
+ * rm: Remove a dev-env container in the current directory
+ * rmi: Remove a dev-env container and its associated image in the current directory
+
+The `connect` command creates an image (if one does not already exist) from the
 given environment with the current working directory mounted in `/src`. It sets
 the working directory of the image to be `/src`. It then creates a container
 from this image (if one does not already exist) and starts the container. That
 container will be re-used on subsequent `connect`s until it is removed with
-`rm`. The `build` command can be used to force the image to built. Any existing
-containers and images will be removed. The container can be destroyed with the
-`rm` command. The image can be destroyed with the `rmi` command.
+`rm`. The `build` command can be used to force this image to built. Any
+existing containers and images will be removed. The container can be destroyed
+with the `rm` command. The image can be destroyed with the `rmi` command.  The
+image and container maintained by these commands is distinct from the one
+managed by the `run` and `spawn`family of commands.
 
-The second style of development environment management is exposed by the `run`
-command.  This command creates an image from the given environment (if one does
-not already exist) and then destroys and re-creates a single use container for
-the execution of a single command. The image is assumed to contain `bash` and
-the arguments passed to the `run` command will be passed to `bash -c` in the
+### Run style
+
+The following commands work together to create an isolated environment for
+running a single command that is isolated from other command invocations.
+
+ * run: Run a command via bash in a dev-env container in the current directory
+ * rmr: Remove a run dev-env container in the current directory
+ * rmri: Remove a run dev-env container and its associated image in the current directory
+
+The `run` command creates an image from the given environment (if one does not
+already exist) and then destroys and re-creates a single use container for the
+execution of a single command. The image is assumed to contain `bash` and the
+arguments passed to the `run` command will be passed to `bash -c` in the
 container. This container and image can be destroyed with the `rmr` and `rmri`
-commands. If `--interactive` is passed to `run` then the container will stay in
-the foreground. Otherwise it will execute in the background and the container
-will exit when the command is complete.
+commands. If `--detached` is passed to `run` then the container will be
+detached and control will return to the shell. The container will exit when the
+command is complete.  Because the container is recreated each time, changes
+made in the container are not persistent. The image and container maintained by
+these commands is distinct from the one managed by the `connect` and
+`spawn`family of commands.
+
+### Spawn style
+
+The following commands work together to create a persistant environment for
+running single commands.
+
+ * spawn: Spawn a detached dev-env container in the current directory
+ * exec: Exec a command via bash in a spawned dev-env container in the current directory
+ * rms: Remove a spawn dev-env container in the current directory
+ * rmsi: Remove a spawn dev-env container and its associated image in the current directory
+
+The `spawn` command creates an image from the given environment (if one does
+not already exist) and then creates and starts a persistent container in the
+background.  The image is assumed to contain `tail` and `tail -f /dev/null` is
+used to keep the container from exiting. The arguments to the `exec` command
+will be executed in this spawned container.  This container and image can be
+destroyed with the `rms` and `rmsi` commands.  If `--detached` is passed to
+`exec` then the container will be detached and control will return to the
+shell. The container will exit when the command is complete.  Because the
+container is persistent , changes made in the container are persistent. The
+image and container maintained by these commands is distinct from the one
+managed by the `connect` and `run` family of commands.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

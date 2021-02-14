@@ -25,13 +25,9 @@ func Run(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	interactive, err := cmd.PersistentFlags().GetBool("interactive")
+	detached, err := cmd.PersistentFlags().GetBool("detached")
 	if err != nil {
 		return err
 	}
-	err = docker.StartContainer(runEnv, interactive)
-	if err != nil {
-		return nil
-	}
-	return nil
+	return docker.StartContainer(runEnv, !detached)
 }

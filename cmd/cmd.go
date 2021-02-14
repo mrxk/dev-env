@@ -24,34 +24,52 @@ var connectCmd = &cobra.Command{
 	Use:   "connect",
 }
 
+var execCmd = &cobra.Command{
+	RunE:  Exec,
+	Short: "Exec a command via bash in a spawned dev-env container in the current directory",
+	Use:   "exec",
+}
+
 var initCmd = &cobra.Command{
 	RunE:  Initialize,
 	Short: "Initialize a dev-env in the current directory",
 	Use:   "init",
 }
 
-var removeContainer = &cobra.Command{
+var removeContainerCmd = &cobra.Command{
 	RunE:  RemoveContainer,
 	Short: "Remove a dev-env container in the current directory",
 	Use:   "rm",
 }
 
-var removeImage = &cobra.Command{
+var removeImageCmd = &cobra.Command{
 	RunE:  RemoveImage,
-	Short: "Destroy a dev-env container and image in the current directory",
+	Short: "Remove a dev-env container and its associated image in the current directory",
 	Use:   "rmi",
 }
 
-var removeRContainer = &cobra.Command{
+var removeRContainerCmd = &cobra.Command{
 	RunE:  RemoveRContainer,
 	Short: "Remove a run dev-env container in the current directory",
 	Use:   "rmr",
 }
 
-var removeRImage = &cobra.Command{
+var removeRImageCmd = &cobra.Command{
 	RunE:  RemoveRImage,
-	Short: "Destroy a run dev-env container and image in the current directory",
+	Short: "Remove a run dev-env container and its associated image in the current directory",
 	Use:   "rmri",
+}
+
+var removeSContainerCmd = &cobra.Command{
+	RunE:  RemoveSContainer,
+	Short: "Remove a spawn dev-env container in the current directory",
+	Use:   "rms",
+}
+
+var removeSImageCmd = &cobra.Command{
+	RunE:  RemoveSImage,
+	Short: "Remove a spawn dev-env container and its associatedimage in the current directory",
+	Use:   "rmsi",
 }
 
 var runCmd = &cobra.Command{
@@ -60,16 +78,27 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 }
 
+var spawnCmd = &cobra.Command{
+	RunE:  Spawn,
+	Short: "Spawn a detached dev-env container in the current directory",
+	Use:   "spawn",
+}
+
 func Execute() error {
-	runCmd.PersistentFlags().BoolP("interactive", "i", false, "run command interactively")
+	execCmd.PersistentFlags().BoolP("detached", "d", false, "run command in the background")
+	runCmd.PersistentFlags().BoolP("detached", "d", false, "run command in the background")
 	rootCmd.PersistentFlags().StringP("env", "e", "main", "environment to use")
 	rootCmd.AddCommand(buildCmd)
 	rootCmd.AddCommand(connectCmd)
+	rootCmd.AddCommand(execCmd)
 	rootCmd.AddCommand(initCmd)
-	rootCmd.AddCommand(removeContainer)
-	rootCmd.AddCommand(removeImage)
-	rootCmd.AddCommand(removeRContainer)
-	rootCmd.AddCommand(removeRImage)
+	rootCmd.AddCommand(removeContainerCmd)
+	rootCmd.AddCommand(removeImageCmd)
+	rootCmd.AddCommand(removeRContainerCmd)
+	rootCmd.AddCommand(removeRImageCmd)
+	rootCmd.AddCommand(removeSContainerCmd)
+	rootCmd.AddCommand(removeSImageCmd)
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(spawnCmd)
 	return rootCmd.Execute()
 }

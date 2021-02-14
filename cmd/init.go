@@ -17,11 +17,7 @@ func Initialize(_ *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	err = writeDefaultDockerFile()
-	if err != nil {
-		return err
-	}
-	return nil
+	return writeDefaultDockerFile()
 }
 
 func writeDefaultConfigFile() error {
@@ -29,17 +25,9 @@ func writeDefaultConfigFile() error {
 	if err != nil {
 		return err
 	}
-	err = cfg.WriteIfNotExist()
-	if err != nil {
-		return err
-	}
-	return nil
+	return cfg.WriteIfNotExist()
 }
 
 func writeDefaultDockerFile() error {
-	err := config.WriteConfigFileIfNotExist("main", config.DockerFile, []byte(DefaultDockerFile))
-	if err != nil {
-		return err
-	}
-	return nil
+	return config.WriteConfigFileIfNotExist("main", config.DockerFile, []byte(DefaultDockerFile))
 }
