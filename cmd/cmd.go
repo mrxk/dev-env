@@ -26,7 +26,7 @@ var connectCmd = &cobra.Command{
 
 var execCmd = &cobra.Command{
 	RunE:  Exec,
-	Short: "Exec a command via bash in a spawned dev-env container in the current directory",
+	Short: "Exec a command in a spawned dev-env container in the current directory",
 	Use:   "exec",
 }
 

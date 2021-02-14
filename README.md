@@ -31,7 +31,7 @@ Usage:
 Available Commands:
   build       Build a dev-env image in the current directory
   connect     Start or connect to a dev-env container in the current directory
-  exec        Exec a command via bash in a spawned dev-env container in the current directory
+  exec        Exec a command in a spawned dev-env container in the current directory
   help        Help about any command
   init        Initialize a dev-env in the current directory
   rm          Remove a dev-env container in the current directory
@@ -73,8 +73,8 @@ Each environment in the `envs` array is an object with the following fields.
 Dev-env expects to find a directory in `.dev-env` named the same as each key in
 the `envs` field in the config file. This directory is expected to contain a
 `Dockerfile` and is the directory within which `docker build` will be run to
-create the container. The resulting image must contain functional `bash` and
-`tail` commands.
+create the container. The resulting image must contain functional `bash` for
+the `run` command and a functional `tail` for the `spawn` command.
 
 ### Example config file
 
