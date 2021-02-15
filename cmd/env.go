@@ -6,7 +6,7 @@ import (
 )
 
 func envFromFlags(flags *pflag.FlagSet) (*config.Env, error) {
-	envName, err := flags.GetString("env")
+	envName, err := flags.GetString(environmentOption)
 	if err != nil {
 		return nil, err
 	}

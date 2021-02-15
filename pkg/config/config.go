@@ -12,7 +12,7 @@ import (
 
 const (
 	ConfigDir  = ".dev-env"
-	ConfigFile = "config.json"
+	ConfigFile = "dev-env.json"
 	DockerFile = "Dockerfile"
 	devEnvTag  = "dev_env"
 )
@@ -50,23 +50,23 @@ func (c *Config) Read() error {
 	if err != nil {
 		return err
 	}
-	datapath := filepath.Join(configDir, ConfigFile)
-	data, err := ioutil.ReadFile(datapath)
+	configpaths, err := filepath.Glob(filepath.Join(configDir, "*", ConfigFile))
 	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
+		return err
+	}
+	for _, configpath := range configpaths {
+		data, err := ioutil.ReadFile(configpath)
+		if err != nil {
+			return err
 		}
-		return err
-	}
-	err = json.Unmarshal(data, c)
-	if err != nil {
-		return err
-	}
-	if c.Version != "1" {
-		return fmt.Errorf("Unknown config version: %s", c.Version)
-	}
-	for dir, env := range c.Envs {
-		env.dockerBuildDir = dir
+		e := Env{}
+		err = json.Unmarshal(data, &e)
+		if err != nil {
+			return err
+		}
+		name := filepath.Base(filepath.Dir(configpath))
+		e.dockerBuildDir = name
+		c.Envs[name] = &e
 	}
 	return nil
 }
@@ -92,29 +92,41 @@ func (c *Config) write(force bool) error {
 	if err != nil {
 		return err
 	}
-	datapath := filepath.Join(configDir, ConfigFile)
-	_, err = os.Stat(datapath)
-	if err == nil { // file exists
-		if !force { // if not forcing then done
-			return nil
+	for name, e := range c.Envs {
+		dirpath := filepath.Join(configDir, name)
+		err = os.MkdirAll(dirpath, 0700)
+		if err != nil {
+			continue
 		}
-	} else if !os.IsNotExist(err) {
-		return err
+		datapath := filepath.Join(dirpath, ConfigFile)
+		_, err = os.Stat(datapath)
+		if err == nil { // file exists
+			if !force { // if not forcing then done
+				continue
+			}
+		} else if !os.IsNotExist(err) {
+			return err
+		}
+		// either err == nil && force == true or err == NotExist
+		data, err := json.MarshalIndent(e, "", "    ")
+		if err != nil {
+			return err
+		}
+		err = ioutil.WriteFile(datapath, data, 0600)
+		if err != nil {
+			return err
+		}
+
 	}
-	// either err == nil && force == true or err == NotExist
-	data, err := json.MarshalIndent(c, "", "    ")
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile(datapath, data, 0600)
+	return nil
 }
 
 func (e *Env) DockerBuildDir() (string, error) {
-	root, err := GetConfigDir()
+	configDir, err := GetConfigDir()
 	if err != nil {
 		return "", err
 	}
-	path := filepath.Join(root, e.dockerBuildDir)
+	path := filepath.Join(configDir, e.dockerBuildDir)
 	err = os.MkdirAll(path, 0700)
 	if err != nil {
 		return "", err
@@ -171,13 +183,6 @@ func WriteConfigFileIfNotExist(dir, filename string, content []byte) error {
 		return err
 	}
 	configFileDir := filepath.Join(configDir, dir)
-	_, err = os.Stat(configFileDir)
-	if err == nil {
-		return nil
-	}
-	if !os.IsNotExist(err) {
-		return err
-	}
 	err = os.MkdirAll(configFileDir, 0700)
 	if err != nil {
 		return err

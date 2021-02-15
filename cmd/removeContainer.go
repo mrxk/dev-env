@@ -18,7 +18,7 @@ func RemoveRContainer(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name + "_r")
+	runEnv := env.WithName(env.Name + runSuffix)
 	return docker.RemoveContainer(runEnv)
 }
 
@@ -27,7 +27,7 @@ func RemoveSContainer(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	spawnEnv := env.WithName(env.Name + "_spawn")
+	spawnEnv := env.WithName(env.Name + spawnSuffix)
 	err = docker.StopContainer(spawnEnv)
 	if err != nil {
 		return err

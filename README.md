@@ -53,45 +53,33 @@ Use "dev-env [command] --help" for more information about a command.
 ## Configuration
 
 Dev-env expects to find a `.dev-env` directory in the current working directory
-containing a `config.json` file and a directory with a `Dockerfile` for each
-environment in the config file.  The directory, a default config file, and a
-`main` environment will be created if they do not exist. The config file
-consists of a single top level objects with the following fields.
+containing at least one directory. The name of that directory will be the name
+of the environment. Inside that directory must be a `dev-env.json` file and a
+`Dockerfile`.  This directory is where `docker build` will be run to create the
+container. The `main` environment will be created with a default `Dockerfile`
+will be created if they do not exist.  The resulting image must contain
+functional `bash` for the `run` command and a functional `tail` for the `spawn`
+command.
 
-| field | type | description |
-|-------|------|-------------|
-| version | string | The version of this config file. Must be "1" |
-| envs | map string to env object | A map of environment name to environment configuration |
-
-Each environment in the `envs` array is an object with the following fields.
+The `dev-env.json` config file consists of a single top level object with the
+following fields.
 
 | field | type | description |
 |-------|------|-------------|
 | containerArgs | string array | A list of arguments to pass to docker create. Each argument in this list is passed to `os.ExpandEnv` before being added to the docker command. Optional. |
 | name | string| The name of the container. Required. Init will create a name for the default `main` environment. |
 
-Dev-env expects to find a directory in `.dev-env` named the same as each key in
-the `envs` field in the config file. This directory is expected to contain a
-`Dockerfile` and is the directory within which `docker build` will be run to
-create the container. The resulting image must contain functional `bash` for
-the `run` command and a functional `tail` for the `spawn` command.
-
 ### Example config file
 
 ```json
 {
-    "envs": {
-        "main": {
-            "containerArgs": [
-                "--cpuset-cpus", "1,3",
-		"-v", "$HOME/.ssh:/home/user/.ssh"
-            ],
-            "name": "nervous_golick"
-        }
-    }
+    "containerArgs": [
+	"--cpuset-cpus", "1,3",
+	"-v", "$HOME/.ssh:/home/user/.ssh"
+    ],
+    "name": "nervous_golick"
 }
 ```
-
 
 ## Details
 
@@ -102,10 +90,10 @@ Dev-env supports three styles of development environment management.
 The following commands work together to manage a persistent interactive shell
 environment.
 
- * build: Build a dev-env image in the current directory
- * connect: Start or connect to a dev-env container in the current directory
- * rm: Remove a dev-env container in the current directory
- * rmi: Remove a dev-env container and its associated image in the current directory
+ * `build`: Build a dev-env image in the current directory
+ * `connect`: Start or connect to a dev-env container in the current directory
+ * `rm`: Remove a dev-env container in the current directory
+ * `rmi`: Remove a dev-env container and its associated image in the current directory
 
 The `connect` command creates an image (if one does not already exist) from the
 given environment with the current working directory mounted in `/src`. It sets
@@ -123,9 +111,9 @@ managed by the `run` and `spawn`family of commands.
 The following commands work together to create an isolated environment for
 running a single command that is isolated from other command invocations.
 
- * run: Run a command via bash in a dev-env container in the current directory
- * rmr: Remove a run dev-env container in the current directory
- * rmri: Remove a run dev-env container and its associated image in the current directory
+ * `run`: Run a command via bash in a dev-env container in the current directory
+ * `rmr`: Remove a run dev-env container in the current directory
+ * `rmri`: Remove a run dev-env container and its associated image in the current directory
 
 The `run` command creates an image from the given environment (if one does not
 already exist) and then destroys and re-creates a single use container for the
@@ -144,10 +132,10 @@ these commands is distinct from the one managed by the `connect` and
 The following commands work together to create a persistant environment for
 running single commands.
 
- * spawn: Spawn a detached dev-env container in the current directory
- * exec: Exec a command via bash in a spawned dev-env container in the current directory
- * rms: Remove a spawn dev-env container in the current directory
- * rmsi: Remove a spawn dev-env container and its associated image in the current directory
+ * `spawn`: Spawn a detached dev-env container in the current directory
+ * `exec`: Exec a command via bash in a spawned dev-env container in the current directory
+ * `rms`: Remove a spawn dev-env container in the current directory
+ * `rmsi`: Remove a spawn dev-env container and its associated image in the current directory
 
 The `spawn` command creates an image from the given environment (if one does
 not already exist) and then creates and starts a persistent container in the

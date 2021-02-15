@@ -5,13 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	DefaultDockerFile = `
-FROM debian:stretch
-ENTRYPOINT ["/bin/bash"]
-`
-)
-
 func Initialize(_ *cobra.Command, _ []string) error {
 	err := writeDefaultConfigFile()
 	if err != nil {
@@ -29,5 +22,5 @@ func writeDefaultConfigFile() error {
 }
 
 func writeDefaultDockerFile() error {
-	return config.WriteConfigFileIfNotExist("main", config.DockerFile, []byte(DefaultDockerFile))
+	return config.WriteConfigFileIfNotExist(defaultEnvironment, config.DockerFile, []byte(defaultDockerFile))
 }

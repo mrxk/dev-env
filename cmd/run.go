@@ -13,19 +13,19 @@ func Run(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name + "_r")
+	runEnv := env.WithName(env.Name + runSuffix)
 	err = docker.BuildImageIfNotExist(runEnv)
 	if err != nil {
 		return err
 	}
-	containerArgs := append(runEnv.ContainerArgs, "--entrypoint", "bash")
+	containerArgs := append(runEnv.ContainerArgs, entrypointOption, runShellCommand)
 	runEnv = runEnv.WithContainerArgs(containerArgs)
-	cmdArgs := []string{"-c", fmt.Sprintf("%s", strings.Join(args, " "))}
+	cmdArgs := []string{shellCommandOption, fmt.Sprintf("%s", strings.Join(args, " "))}
 	err = docker.RecreateContainer(runEnv, cmdArgs)
 	if err != nil {
 		return err
 	}
-	detached, err := cmd.PersistentFlags().GetBool("detached")
+	detached, err := cmd.PersistentFlags().GetBool(detachedOption)
 	if err != nil {
 		return err
 	}
