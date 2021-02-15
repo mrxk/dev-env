@@ -55,9 +55,9 @@ Use "dev-env [command] --help" for more information about a command.
 Dev-env expects to find a `.dev-env` directory in the current working directory
 containing at least one directory. The name of that directory will be the name
 of the environment. Inside that directory must be a `dev-env.json` file and a
-`Dockerfile`.  This directory is where `docker build` will be run to create the
+`Dockerfile`. This directory is where `docker build` will be run to create the
 container. The `main` environment will be created with a default `Dockerfile`
-will be created if they do not exist.  The resulting image must contain
+will be created if they do not exist. The resulting image must contain
 functional `bash` for the `run` command and a functional `tail` for the `spawn`
 command.
 
@@ -102,7 +102,7 @@ from this image (if one does not already exist) and starts the container. That
 container will be re-used on subsequent `connect`s until it is removed with
 `rm`. The `build` command can be used to force this image to built. Any
 existing containers and images will be removed. The container can be destroyed
-with the `rm` command. The image can be destroyed with the `rmi` command.  The
+with the `rm` command. The image can be destroyed with the `rmi` command. The
 image and container maintained by these commands is distinct from the one
 managed by the `run` and `spawn`family of commands.
 
@@ -119,13 +119,14 @@ The `run` command creates an image from the given environment (if one does not
 already exist) and then destroys and re-creates a single use container for the
 execution of a single command. The image is assumed to contain `bash` and the
 arguments passed to the `run` command will be passed to `bash -c` in the
-container. This container and image can be destroyed with the `rmr` and `rmri`
-commands. If `--detached` is passed to `run` then the container will be
-detached and control will return to the shell. The container will exit when the
-command is complete.  Because the container is recreated each time, changes
-made in the container are not persistent. The image and container maintained by
-these commands is distinct from the one managed by the `connect` and
-`spawn`family of commands.
+container. If the arguments themselves contain flags then separate the entire
+command with double dashes `--`. For example, `dev-env run -- ls -la /`. This
+container and image can be destroyed with the `rmr` and `rmri` commands. If
+`--detached` is passed to `run` then the container will be detached and control
+will return to the shell. The container will exit when the command is complete.
+Because the container is recreated each time, changes made in the container are
+not persistent. The image and container maintained by these commands is
+distinct from the one managed by the `connect` and `spawn`family of commands.
 
 ### Spawn style
 
@@ -139,15 +140,17 @@ running single commands.
 
 The `spawn` command creates an image from the given environment (if one does
 not already exist) and then creates and starts a persistent container in the
-background.  The image is assumed to contain `tail` and `tail -f /dev/null` is
+background. The image is assumed to contain `tail` and `tail -f /dev/null` is
 used to keep the container from exiting. The arguments to the `exec` command
-will be executed in this spawned container.  This container and image can be
-destroyed with the `rms` and `rmsi` commands.  If `--detached` is passed to
-`exec` then the container will be detached and control will return to the
-shell. The container will exit when the command is complete.  Because the
-container is persistent , changes made in the container are persistent. The
-image and container maintained by these commands is distinct from the one
-managed by the `connect` and `run` family of commands.
+will be executed in this spawned container. If the arguments themselves contain
+flags then separate the entire command with double dashes `--`. For example,
+`dev-env exec -- ls -la /`. This container and image can be destroyed with the
+`rms` and `rmsi` commands. If `--detached` is passed to `exec` then the
+container will be detached and control will return to the shell. The container
+will exit when the command is complete. Because the container is persistent ,
+changes made in the container are persistent. The image and container
+maintained by these commands is distinct from the one managed by the `connect`
+and `run` family of commands.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

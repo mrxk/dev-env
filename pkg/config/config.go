@@ -188,11 +188,11 @@ func WriteConfigFileIfNotExist(dir, filename string, content []byte) error {
 		return err
 	}
 	configFilePath := filepath.Join(configFileDir, filename)
-	err = ioutil.WriteFile(configFilePath, content, 0600)
-	if err != nil {
+	_, err = os.Stat(configFilePath)
+	if err == nil || os.IsNotExist(err) == false {
 		return err
 	}
-	return nil
+	return ioutil.WriteFile(configFilePath, content, 0600)
 }
 
 func GetProjectRoot(path string) string {
