@@ -11,6 +11,7 @@ func Spawn(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 	spawnEnv := env.WithName(env.Name + spawnSuffix)
+	docker.WarnIfOutOfDate(spawnEnv)
 	err = docker.BuildImageIfNotExist(spawnEnv)
 	if err != nil {
 		return err

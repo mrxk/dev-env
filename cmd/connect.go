@@ -10,6 +10,7 @@ func Connect(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
+	docker.WarnIfOutOfDate(env)
 	err = docker.BuildImageIfNotExist(env)
 	if err != nil {
 		return err

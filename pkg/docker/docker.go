@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/mrxk/dev-env/pkg/config"
 )
@@ -224,4 +227,82 @@ func StopContainer(env *config.Env) error {
 		return err
 	}
 	return dockerCommand.Wait()
+}
+
+func WarnIfOutOfDate(env *config.Env) {
+	WarnIfContainerOutOfDate(env)
+	WarnIfImageOutOfDate(env)
+}
+
+func WarnIfImageOutOfDate(env *config.Env) {
+	if !ImageExists(env) {
+		return
+	}
+	imageCreationTime, err := ImageCreationTime(env)
+	if err != nil {
+		fmt.Println("WARNING: ", err)
+		return
+	}
+	dockerFileModTime, err := DockerFileModTime(env)
+	if err != nil {
+		fmt.Println("WARNING: ", err)
+		return
+	}
+	if dockerFileModTime.After(imageCreationTime) {
+		fmt.Println("WARNING: Dockerfile modified after image created.")
+	}
+}
+
+func WarnIfContainerOutOfDate(env *config.Env) {
+	if !ContainerExists(env) {
+		return
+	}
+	containerCreationTime, err := ContainerCreationTime(env)
+	if err != nil {
+		fmt.Println("WARNING: ", err)
+		return
+	}
+	dockerFileModTime, err := DockerFileModTime(env)
+	if err != nil {
+		fmt.Println("WARNING: ", err)
+		return
+	}
+	if dockerFileModTime.After(containerCreationTime) {
+		fmt.Println("WARNING: Dockerfile modified after container created.")
+	}
+}
+
+func ImageCreationTime(env *config.Env) (time.Time, error) {
+	imageNameAndTag := env.ImageNameAndTag()
+	dockerCommand := exec.Command("docker", "images", imageNameAndTag, "--format", "{{.CreatedAt}}")
+	output, err := dockerCommand.CombinedOutput()
+	if err != nil {
+		return time.Time{}, err
+	}
+	trimmedOutput := strings.TrimSpace(string(output))
+	return time.Parse("2006-01-02 15:04:05 -0700 MST", trimmedOutput)
+}
+
+func ContainerCreationTime(env *config.Env) (time.Time, error) {
+	containerName := env.ContainerName()
+	dockerCommand := exec.Command("docker", "inspect", containerName, "--format", "{{.Created}}")
+	output, err := dockerCommand.CombinedOutput()
+	if err != nil {
+		return time.Time{}, err
+	}
+	trimmedOutput := strings.TrimSpace(string(output))
+	return time.Parse("2006-01-02T15:04:05.999999999Z", trimmedOutput)
+}
+
+func DockerFileModTime(env *config.Env) (time.Time, error) {
+	dockerConfigDir, err := env.DockerBuildDir()
+	if err != nil {
+		return time.Time{}, err
+	}
+	dockerFilePath := filepath.Join(dockerConfigDir, "Dockerfile")
+	stat, err := os.Stat(dockerFilePath)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return stat.ModTime(), nil
 }

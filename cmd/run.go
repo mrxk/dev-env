@@ -14,6 +14,7 @@ func Run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	runEnv := env.WithName(env.Name + runSuffix)
+	docker.WarnIfImageOutOfDate(runEnv)
 	err = docker.BuildImageIfNotExist(runEnv)
 	if err != nil {
 		return err
