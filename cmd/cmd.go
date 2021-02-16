@@ -18,6 +18,18 @@ var buildCmd = &cobra.Command{
 	Use:   "build",
 }
 
+var buildRCmd = &cobra.Command{
+	RunE:  BuildR,
+	Short: "Build a run dev-env image in the current directory",
+	Use:   "buildr",
+}
+
+var buildSCmd = &cobra.Command{
+	RunE:  BuildS,
+	Short: "Build a spawn dev-env image in the current directory",
+	Use:   "builds",
+}
+
 var connectCmd = &cobra.Command{
 	RunE:  Connect,
 	Short: "Start or connect to a dev-env container in the current directory",
@@ -84,11 +96,19 @@ var spawnCmd = &cobra.Command{
 	Use:   "spawn",
 }
 
+var stopCmd = &cobra.Command{
+	RunE:  Stop,
+	Short: "Stop a spawned dev-env container in the current directory",
+	Use:   "stop",
+}
+
 func Execute() error {
 	execCmd.PersistentFlags().BoolP("detached", "d", false, "run command in the background")
 	runCmd.PersistentFlags().BoolP("detached", "d", false, "run command in the background")
 	rootCmd.PersistentFlags().StringP("env", "e", "main", "environment to use")
 	rootCmd.AddCommand(buildCmd)
+	rootCmd.AddCommand(buildRCmd)
+	rootCmd.AddCommand(buildSCmd)
 	rootCmd.AddCommand(connectCmd)
 	rootCmd.AddCommand(execCmd)
 	rootCmd.AddCommand(initCmd)
@@ -100,5 +120,6 @@ func Execute() error {
 	rootCmd.AddCommand(removeSImageCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(spawnCmd)
+	rootCmd.AddCommand(stopCmd)
 	return rootCmd.Execute()
 }

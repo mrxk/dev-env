@@ -30,6 +30,8 @@ Usage:
 
 Available Commands:
   build       Build a dev-env image in the current directory
+  buildr      Build a run dev-env image in the current directory
+  builds      Build a spawn dev-env image in the current directory
   connect     Start or connect to a dev-env container in the current directory
   exec        Exec a command in a spawned dev-env container in the current directory
   help        Help about any command
@@ -42,6 +44,7 @@ Available Commands:
   rmsi        Remove a spawn dev-env container and its associated image in the current directory
   run         Run a command via bash in a dev-env container in the current directory
   spawn       Spawn a detached dev-env container in the current directory
+  stop        Stop a spawned dev-env container in the current directory
 
 Flags:
   -e, --env string   environment to use (default "main")
@@ -111,6 +114,7 @@ managed by the `run` and `spawn`family of commands.
 The following commands work together to create an isolated environment for
 running a single command that is isolated from other command invocations.
 
+ * `buildr`: Build a run dev-env image in the current directory
  * `run`: Run a command via bash in a dev-env container in the current directory
  * `rmr`: Remove a run dev-env container in the current directory
  * `rmri`: Remove a run dev-env container and its associated image in the current directory
@@ -133,8 +137,10 @@ distinct from the one managed by the `connect` and `spawn`family of commands.
 The following commands work together to create a persistant environment for
 running single commands.
 
+ * `builds`: Build a spawn dev-env image in the current directory
  * `spawn`: Spawn a detached dev-env container in the current directory
  * `exec`: Exec a command via bash in a spawned dev-env container in the current directory
+ * `stop`: Stop a spawned dev-env container in the current directory
  * `rms`: Remove a spawn dev-env container in the current directory
  * `rmsi`: Remove a spawn dev-env container and its associated image in the current directory
 
