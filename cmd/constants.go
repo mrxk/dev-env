@@ -3,6 +3,7 @@ package cmd
 const (
 	defaultDockerFile = `
 FROM debian:stretch
+LABEL creator=dev-env
 ENTRYPOINT ["/bin/bash"]
 `
 	defaultEnvironment = "main"
