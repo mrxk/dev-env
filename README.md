@@ -29,26 +29,20 @@ Usage:
   dev-env [command]
 
 Available Commands:
-  build       Build a dev-env image in the current directory
-  buildr      Build a run dev-env image in the current directory
-  builds      Build a spawn dev-env image in the current directory
   connect     Start or connect to a dev-env container in the current directory
   exec        Exec a command in a spawned dev-env container in the current directory
   help        Help about any command
   init        Initialize a dev-env in the current directory
+  rebuild     Rebuild a dev-env image in the current directory
   rm          Remove a dev-env container in the current directory
   rmi         Remove a dev-env container and its associated image in the current directory
-  rmr         Remove a run dev-env container in the current directory
-  rmri        Remove a run dev-env container and its associated image in the current directory
-  rms         Remove a spawn dev-env container in the current directory
-  rmsi        Remove a spawn dev-env container and its associated image in the current directory
   run         Run a command via bash in a dev-env container in the current directory
   spawn       Spawn a detached dev-env container in the current directory
   stop        Stop a spawned dev-env container in the current directory
 
 Flags:
-  -e, --env string   environment to use (default "main")
-  -h, --help         help for dev-env
+  -e, --environment string   environment to use (default "main")
+  -h, --help                 help for dev-env
 
 Use "dev-env [command] --help" for more information about a command.
 ```
@@ -78,7 +72,8 @@ following fields.
 {
     "containerArgs": [
 	"--cpuset-cpus", "1,3",
-	"-v", "$HOME/.ssh:/home/user/.ssh"
+	"-v", "${HOME}/.ssh:/home/user/.ssh",
+        "-v", "${PROJECTROOT}:/src"
     ],
     "name": "nervous_golick"
 }
@@ -86,14 +81,14 @@ following fields.
 
 ## Details
 
-Dev-env supports three styles of development environment management.
+Dev-env supports three types of development environment management.
 
-### Connect style
+### Connect type
 
 The following commands work together to manage a persistent interactive shell
 environment.
 
- * `build`: Build a dev-env image in the current directory
+ * `rebuild`: Build a dev-env image in the current directory
  * `connect`: Start or connect to a dev-env container in the current directory
  * `rm`: Remove a dev-env container in the current directory
  * `rmi`: Remove a dev-env container and its associated image in the current directory
@@ -109,15 +104,15 @@ with the `rm` command. The image can be destroyed with the `rmi` command. The
 image and container maintained by these commands is distinct from the one
 managed by the `run` and `spawn`family of commands.
 
-### Run style
+### Run type
 
 The following commands work together to create an isolated environment for
 running a single command that is isolated from other command invocations.
 
- * `buildr`: Build a run dev-env image in the current directory
+ * `rebuild --type run`: Build a run dev-env image in the current directory
  * `run`: Run a command via bash in a dev-env container in the current directory
- * `rmr`: Remove a run dev-env container in the current directory
- * `rmri`: Remove a run dev-env container and its associated image in the current directory
+ * `rm --type run`: Remove a run dev-env container in the current directory
+ * `rmi --type run`: Remove a run dev-env container and its associated image in the current directory
 
 The `run` command creates an image from the given environment (if one does not
 already exist) and then destroys and re-creates a single use container for the
@@ -132,17 +127,17 @@ Because the container is recreated each time, changes made in the container are
 not persistent. The image and container maintained by these commands is
 distinct from the one managed by the `connect` and `spawn`family of commands.
 
-### Spawn style
+### Spawn type
 
 The following commands work together to create a persistant environment for
 running single commands.
 
- * `builds`: Build a spawn dev-env image in the current directory
+ * `rebuild --type spawn`: Build a spawn dev-env image in the current directory
  * `spawn`: Spawn a detached dev-env container in the current directory
  * `exec`: Exec a command via bash in a spawned dev-env container in the current directory
  * `stop`: Stop a spawned dev-env container in the current directory
- * `rms`: Remove a spawn dev-env container in the current directory
- * `rmsi`: Remove a spawn dev-env container and its associated image in the current directory
+ * `rm --type spawn`: Remove a spawn dev-env container in the current directory
+ * `rmi --type spawn`: Remove a spawn dev-env container and its associated image in the current directory
 
 The `spawn` command creates an image from the given environment (if one does
 not already exist) and then creates and starts a persistent container in the

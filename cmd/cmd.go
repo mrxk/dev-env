@@ -12,24 +12,6 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-var buildCmd = &cobra.Command{
-	RunE:  Build,
-	Short: "Build a dev-env image in the current directory",
-	Use:   "build",
-}
-
-var buildRCmd = &cobra.Command{
-	RunE:  BuildR,
-	Short: "Build a run dev-env image in the current directory",
-	Use:   "buildr",
-}
-
-var buildSCmd = &cobra.Command{
-	RunE:  BuildS,
-	Short: "Build a spawn dev-env image in the current directory",
-	Use:   "builds",
-}
-
 var connectCmd = &cobra.Command{
 	RunE:  Connect,
 	Short: "Start or connect to a dev-env container in the current directory",
@@ -48,6 +30,12 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 }
 
+var rebuildCmd = &cobra.Command{
+	RunE:  Rebuild,
+	Short: "Rebuild a dev-env image in the current directory",
+	Use:   "rebuild",
+}
+
 var removeContainerCmd = &cobra.Command{
 	RunE:  RemoveContainer,
 	Short: "Remove a dev-env container in the current directory",
@@ -58,30 +46,6 @@ var removeImageCmd = &cobra.Command{
 	RunE:  RemoveImage,
 	Short: "Remove a dev-env container and its associated image in the current directory",
 	Use:   "rmi",
-}
-
-var removeRContainerCmd = &cobra.Command{
-	RunE:  RemoveRContainer,
-	Short: "Remove a run dev-env container in the current directory",
-	Use:   "rmr",
-}
-
-var removeRImageCmd = &cobra.Command{
-	RunE:  RemoveRImage,
-	Short: "Remove a run dev-env container and its associated image in the current directory",
-	Use:   "rmri",
-}
-
-var removeSContainerCmd = &cobra.Command{
-	RunE:  RemoveSContainer,
-	Short: "Remove a spawn dev-env container in the current directory",
-	Use:   "rms",
-}
-
-var removeSImageCmd = &cobra.Command{
-	RunE:  RemoveSImage,
-	Short: "Remove a spawn dev-env container and its associatedimage in the current directory",
-	Use:   "rmsi",
 }
 
 var runCmd = &cobra.Command{
@@ -103,21 +67,18 @@ var stopCmd = &cobra.Command{
 }
 
 func Execute() error {
+	rebuildCmd.PersistentFlags().StringSliceP("type", "t", []string{"connect"}, "type of image to rebuild [all, connect, run, spawn]")
+	removeContainerCmd.PersistentFlags().StringSliceP("type", "t", []string{"connect"}, "type of image to rebuild [all, connect, run, spawn]")
+	removeImageCmd.PersistentFlags().StringSliceP("type", "t", []string{"connect"}, "type of image to rebuild [all, connect, run, spawn]")
 	execCmd.PersistentFlags().BoolP("detached", "d", false, "run command in the background")
 	runCmd.PersistentFlags().BoolP("detached", "d", false, "run command in the background")
-	rootCmd.PersistentFlags().StringP("env", "e", "main", "environment to use")
-	rootCmd.AddCommand(buildCmd)
-	rootCmd.AddCommand(buildRCmd)
-	rootCmd.AddCommand(buildSCmd)
+	rootCmd.PersistentFlags().StringP("environment", "e", "main", "environment to use")
 	rootCmd.AddCommand(connectCmd)
 	rootCmd.AddCommand(execCmd)
 	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(rebuildCmd)
 	rootCmd.AddCommand(removeContainerCmd)
 	rootCmd.AddCommand(removeImageCmd)
-	rootCmd.AddCommand(removeRContainerCmd)
-	rootCmd.AddCommand(removeRImageCmd)
-	rootCmd.AddCommand(removeSContainerCmd)
-	rootCmd.AddCommand(removeSImageCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(spawnCmd)
 	rootCmd.AddCommand(stopCmd)

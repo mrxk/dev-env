@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func RemoveImage(cmd *cobra.Command, _ []string) error {
+func Rebuild(cmd *cobra.Command, _ []string) error {
 	types, err := cmd.PersistentFlags().GetStringSlice(constants.TypeOption)
 	if err != nil {
 		return err
@@ -15,59 +15,60 @@ func RemoveImage(cmd *cobra.Command, _ []string) error {
 	for _, t := range types {
 		switch t {
 		case constants.AllType:
-			err = removeConnectImage(cmd)
+			err = rebuildConnectImage(cmd)
 			if err != nil {
 				return err
 			}
-			err = removeRunImage(cmd)
+			err = rebuildRunImage(cmd)
 			if err != nil {
 				return err
 			}
-			return removeSpawnImage(cmd)
+			return rebuildSpawnImage(cmd)
 		case constants.ConnectType:
-			return removeConnectImage(cmd)
+			return rebuildConnectImage(cmd)
 		case constants.RunType:
-			return removeRunImage(cmd)
+			return rebuildRunImage(cmd)
 		case constants.SpawnType:
-			return removeSpawnImage(cmd)
+			return rebuildSpawnImage(cmd)
 		}
 	}
 	return nil
 }
 
-func removeConnectImage(cmd *cobra.Command) error {
+func rebuildConnectImage(cmd *cobra.Command) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
-	return removeImage(env)
+	return rebuildImage(env)
 }
 
-func removeRunImage(cmd *cobra.Command) error {
+func rebuildRunImage(cmd *cobra.Command) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
-	return removeImage(env.WithName(env.Name + constants.RunSuffix))
+	runEnv := env.WithName(env.Name + constants.RunSuffix)
+	return rebuildImage(runEnv)
 }
 
-func removeSpawnImage(cmd *cobra.Command) error {
+func rebuildSpawnImage(cmd *cobra.Command) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
 	spawnEnv := env.WithName(env.Name + constants.SpawnSuffix)
-	err = docker.StopContainer(spawnEnv)
-	if err != nil {
-		return err
-	}
-	return removeImage(spawnEnv)
+	return rebuildImage(spawnEnv)
 }
 
-func removeImage(env *config.Env) error {
+func rebuildImage(env *config.Env) error {
 	err := docker.RemoveContainer(env)
 	if err != nil {
 		return err
 	}
-	return docker.RemoveImage(env)
+	err = docker.RemoveImage(env)
+	if err != nil {
+		return err
+	}
+	return docker.BuildImage(env)
 }

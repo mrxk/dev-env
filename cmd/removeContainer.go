@@ -7,6 +7,34 @@ import (
 )
 
 func RemoveContainer(cmd *cobra.Command, _ []string) error {
+	types, err := cmd.PersistentFlags().GetStringSlice(constants.TypeOption)
+	if err != nil {
+		return err
+	}
+	for _, t := range types {
+		switch t {
+		case constants.AllType:
+			err = removeConnectContainer(cmd)
+			if err != nil {
+				return err
+			}
+			err = removeRunContainer(cmd)
+			if err != nil {
+				return err
+			}
+			return removeSpawnContainer(cmd)
+		case constants.ConnectType:
+			return removeConnectContainer(cmd)
+		case constants.RunType:
+			return removeRunContainer(cmd)
+		case constants.SpawnType:
+			return removeSpawnContainer(cmd)
+		}
+	}
+	return nil
+}
+
+func removeConnectContainer(cmd *cobra.Command) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
@@ -14,7 +42,7 @@ func RemoveContainer(cmd *cobra.Command, _ []string) error {
 	return docker.RemoveContainer(env)
 }
 
-func RemoveRContainer(cmd *cobra.Command, _ []string) error {
+func removeRunContainer(cmd *cobra.Command) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
@@ -27,7 +55,7 @@ func RemoveRContainer(cmd *cobra.Command, _ []string) error {
 	return docker.RemoveContainer(runEnv)
 }
 
-func RemoveSContainer(cmd *cobra.Command, _ []string) error {
+func removeSpawnContainer(cmd *cobra.Command) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
