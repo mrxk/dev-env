@@ -81,25 +81,16 @@ func ContainerRunning(env *config.Env) bool {
 }
 
 func CreateContainer(env *config.Env, cmdArgs []string) error {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	projectRoot := config.GetProjectRoot(cwd)
 	containerName := env.ContainerName()
 	dockerArgs := []string{
 		"create",
 		"-i",
 		"-t",
-		"-v",
-		projectRoot + ":/src",
-		"-w",
-		"/src",
 		"--name",
 		containerName,
 	}
 	for _, containerArg := range env.ContainerArgs {
-		expandedArg := os.ExpandEnv(containerArg)
+		expandedArg := os.Expand(containerArg, expand)
 		dockerArgs = append(dockerArgs, expandedArg)
 	}
 	imageNameAndTag := env.ImageNameAndTag()
@@ -112,7 +103,7 @@ func CreateContainer(env *config.Env, cmdArgs []string) error {
 	dockerCommand := exec.Command("docker", dockerArgs...)
 	dockerCommand.Stdout = os.Stdout
 	dockerCommand.Stderr = os.Stderr
-	err = dockerCommand.Start()
+	err := dockerCommand.Start()
 	if err != nil {
 		return err
 	}
@@ -141,6 +132,20 @@ func DockerFileModTime(env *config.Env) (time.Time, error) {
 		return time.Time{}, err
 	}
 	return stat.ModTime(), nil
+}
+
+func expand(name string) string {
+	normalizedName := strings.ToUpper(name)
+	switch normalizedName {
+	case "PROJECTROOT":
+		root, err := config.GetProjectRoot()
+		if err == nil {
+			return root
+		}
+		fallthrough
+	default:
+		return os.Getenv(name)
+	}
 }
 
 func ImageCreationTime(env *config.Env) (time.Time, error) {

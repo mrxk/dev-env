@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/mrxk/dev-env/pkg/config"
+	"github.com/mrxk/dev-env/pkg/constants"
 	"github.com/mrxk/dev-env/pkg/docker"
 	"github.com/spf13/cobra"
 )
@@ -19,7 +20,7 @@ func BuildR(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name + runSuffix)
+	runEnv := env.WithName(env.Name + constants.RunSuffix)
 	return rebuild(runEnv)
 }
 
@@ -28,7 +29,7 @@ func BuildS(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	spawnEnv := env.WithName(env.Name + spawnSuffix)
+	spawnEnv := env.WithName(env.Name + constants.SpawnSuffix)
 	return rebuild(spawnEnv)
 }
 

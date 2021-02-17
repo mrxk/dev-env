@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/docker/docker/pkg/namesgenerator"
+	"github.com/mrxk/dev-env/pkg/constants"
 )
 
 const (
@@ -32,9 +33,10 @@ func NewConfig() (Config, error) {
 	c := Config{
 		Version: "1",
 		Envs: map[string]*Env{
-			"main": {
+			constants.DefaultEnvironment: {
+				ContainerArgs:  constants.DefaultContainerArgs,
 				Name:           namesgenerator.GetRandomName(0),
-				dockerBuildDir: "main",
+				dockerBuildDir: constants.DefaultEnvironment,
 			},
 		},
 	}
@@ -164,11 +166,10 @@ func (e *Env) WithContainerArgs(containerArgs []string) *Env {
 }
 
 func GetConfigDir() (string, error) {
-	cwd, err := os.Getwd()
+	path, err := GetProjectRoot()
 	if err != nil {
 		return "", nil
 	}
-	path := GetProjectRoot(cwd)
 	configDir := filepath.Join(path, ConfigDir)
 	err = os.MkdirAll(configDir, 0700)
 	if err != nil {
@@ -195,17 +196,21 @@ func WriteConfigFileIfNotExist(dir, filename string, content []byte) error {
 	return ioutil.WriteFile(configFilePath, content, 0600)
 }
 
-func GetProjectRoot(path string) string {
-	candidatePath, err := filepath.Abs(path)
+func GetProjectRoot() (string, error) {
+	cwd, err := os.Getwd()
 	if err != nil {
-		return path
+		return "", err
+	}
+	candidatePath, err := filepath.Abs(cwd)
+	if err != nil {
+		return cwd, nil
 	}
 	candidatePath = filepath.Clean(candidatePath)
 	for {
 		candidateProjectRoot := filepath.Join(candidatePath, ConfigDir)
 		_, err = os.Stat(candidateProjectRoot)
 		if err == nil {
-			return candidatePath
+			return candidatePath, nil
 		}
 		parentPath := filepath.Dir(candidatePath)
 		if candidatePath == parentPath {
@@ -213,5 +218,5 @@ func GetProjectRoot(path string) string {
 		}
 		candidatePath = parentPath
 	}
-	return path
+	return cwd, nil
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/mrxk/dev-env/pkg/constants"
 	"github.com/mrxk/dev-env/pkg/docker"
 	"github.com/spf13/cobra"
 )
@@ -14,8 +15,8 @@ func Exec(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name + spawnSuffix)
-	detached, err := cmd.PersistentFlags().GetBool(detachedOption)
+	runEnv := env.WithName(env.Name + constants.SpawnSuffix)
+	detached, err := cmd.PersistentFlags().GetBool(constants.DetachedOption)
 	if err != nil {
 		return err
 	}

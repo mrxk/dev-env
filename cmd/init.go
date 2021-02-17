@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/mrxk/dev-env/pkg/config"
+	"github.com/mrxk/dev-env/pkg/constants"
 	"github.com/spf13/cobra"
 )
 
@@ -22,5 +23,8 @@ func writeDefaultConfigFile() error {
 }
 
 func writeDefaultDockerFile() error {
-	return config.WriteConfigFileIfNotExist(defaultEnvironment, config.DockerFile, []byte(defaultDockerFile))
+	return config.WriteConfigFileIfNotExist(
+		constants.DefaultEnvironment,
+		config.DockerFile,
+		[]byte(constants.DefaultDockerFile))
 }

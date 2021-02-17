@@ -69,7 +69,7 @@ following fields.
 
 | field | type | description |
 |-------|------|-------------|
-| containerArgs | string array | A list of arguments to pass to docker create. Each argument in this list is passed to `os.ExpandEnv` before being added to the docker command. Optional. |
+| containerArgs | string array | A list of arguments to pass to docker create. Dev-env replaces `${var}` or `$var` in each argument according to the values of the current environment variables. In addition `${PROJECTROOT}` or `$PROJECTROOT`is replaced with the parent directory of the `.dev-env` directory. Optional. |
 | name | string| The name of the container. Required. Init will create a name for the default `main` environment. |
 
 ### Example config file
