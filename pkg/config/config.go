@@ -24,8 +24,9 @@ type Config struct {
 }
 
 type Env struct {
-	ContainerArgs  []string `json:"containerArgs"`
-	Name           string   `json:"name"`
+	ContainerArgs  []string          `json:"containerArgs"`
+	Name           string            `json:"name"`
+	Options        map[string]string `json:"options"`
 	dockerBuildDir string
 }
 
@@ -36,6 +37,7 @@ func NewConfig() (Config, error) {
 			constants.DefaultEnvironment: {
 				ContainerArgs:  constants.DefaultContainerArgs,
 				Name:           namesgenerator.GetRandomName(0),
+				Options:        map[string]string{},
 				dockerBuildDir: constants.DefaultEnvironment,
 			},
 		},

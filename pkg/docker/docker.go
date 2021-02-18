@@ -5,10 +5,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/mrxk/dev-env/pkg/config"
+	"github.com/mrxk/dev-env/pkg/constants"
 )
 
 func BuildImage(env *config.Env) error {
@@ -225,6 +227,18 @@ func RemoveImage(env *config.Env) error {
 	return nil
 }
 
+func skipOutOfDateWarnings(env *config.Env) bool {
+	value, ok := env.Options[constants.SkipOutOfDateWarningsOption]
+	if !ok {
+		return false
+	}
+	skip, err := strconv.ParseBool(value)
+	if err != nil {
+		return false
+	}
+	return skip
+}
+
 func SpawnContainer(env *config.Env) error {
 	containerName := env.ContainerName()
 	dockerArgs := []string{
@@ -270,6 +284,9 @@ func StopContainer(env *config.Env) error {
 }
 
 func WarnIfContainerOutOfDate(env *config.Env) {
+	if skipOutOfDateWarnings(env) {
+		return
+	}
 	if !ContainerExists(env) {
 		return
 	}
@@ -289,6 +306,9 @@ func WarnIfContainerOutOfDate(env *config.Env) {
 }
 
 func WarnIfImageOutOfDate(env *config.Env) {
+	if skipOutOfDateWarnings(env) {
+		return
+	}
 	if !ImageExists(env) {
 		return
 	}
@@ -308,6 +328,9 @@ func WarnIfImageOutOfDate(env *config.Env) {
 }
 
 func WarnIfOutOfDate(env *config.Env) {
+	if skipOutOfDateWarnings(env) {
+		return
+	}
 	WarnIfContainerOutOfDate(env)
 	WarnIfImageOutOfDate(env)
 }
