@@ -227,16 +227,16 @@ func RemoveImage(env *config.Env) error {
 	return nil
 }
 
-func skipOutOfDateWarnings(env *config.Env) bool {
-	value, ok := env.Options[constants.SkipOutOfDateWarningsOption]
+func includeOutOfDateWarnings(env *config.Env) bool {
+	value, ok := env.Options[constants.OutOfDateWarningsOption]
 	if !ok {
 		return false
 	}
-	skip, err := strconv.ParseBool(value)
+	include, err := strconv.ParseBool(value)
 	if err != nil {
 		return false
 	}
-	return skip
+	return include
 }
 
 func SpawnContainer(env *config.Env) error {
@@ -284,7 +284,7 @@ func StopContainer(env *config.Env) error {
 }
 
 func WarnIfContainerOutOfDate(env *config.Env) {
-	if skipOutOfDateWarnings(env) {
+	if !includeOutOfDateWarnings(env) {
 		return
 	}
 	if !ContainerExists(env) {
@@ -306,7 +306,7 @@ func WarnIfContainerOutOfDate(env *config.Env) {
 }
 
 func WarnIfImageOutOfDate(env *config.Env) {
-	if skipOutOfDateWarnings(env) {
+	if !includeOutOfDateWarnings(env) {
 		return
 	}
 	if !ImageExists(env) {
@@ -328,7 +328,7 @@ func WarnIfImageOutOfDate(env *config.Env) {
 }
 
 func WarnIfOutOfDate(env *config.Env) {
-	if skipOutOfDateWarnings(env) {
+	if !includeOutOfDateWarnings(env) {
 		return
 	}
 	WarnIfContainerOutOfDate(env)
