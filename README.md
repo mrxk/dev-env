@@ -33,6 +33,7 @@ Available Commands:
   exec        Exec a command in a spawned dev-env container in the current directory
   help        Help about any command
   init        Initialize a dev-env in the current directory
+  list        List containers and images in the current directory
   rebuild     Rebuild a dev-env image in the current directory
   rm          Remove a dev-env container in the current directory
   rmi         Remove a dev-env container and its associated image in the current directory

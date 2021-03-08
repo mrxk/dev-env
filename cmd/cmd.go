@@ -30,6 +30,13 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 }
 
+var listCmd = &cobra.Command{
+	RunE:    List,
+	Short:   "List containers and images in the current directory",
+	Use:     "list",
+	Aliases: []string{"ls"},
+}
+
 var rebuildCmd = &cobra.Command{
 	RunE:  Rebuild,
 	Short: "Rebuild a dev-env image in the current directory",
@@ -76,6 +83,7 @@ func Execute() error {
 	rootCmd.AddCommand(connectCmd)
 	rootCmd.AddCommand(execCmd)
 	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(rebuildCmd)
 	rootCmd.AddCommand(removeContainerCmd)
 	rootCmd.AddCommand(removeImageCmd)

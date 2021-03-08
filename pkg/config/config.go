@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/mrxk/dev-env/pkg/constants"
@@ -62,6 +63,23 @@ func (c *Config) AddEnvIfNotExistFor(name string) {
 	c.Envs[name] = NewEnv(name)
 }
 
+func (c *Config) EnvFor(envName string) (*Env, error) {
+	env, ok := c.Envs[envName]
+	if !ok {
+		return nil, fmt.Errorf("No such environment found: %s", envName)
+	}
+	return env, nil
+}
+
+func (c *Config) EnvNames() []string {
+	names := []string{}
+	for name := range c.Envs {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
+}
+
 func (c *Config) Read() error {
 	if c == nil {
 		return nil
@@ -89,14 +107,6 @@ func (c *Config) Read() error {
 		c.Envs[name] = &e
 	}
 	return nil
-}
-
-func (c *Config) EnvFor(envName string) (*Env, error) {
-	env, ok := c.Envs[envName]
-	if !ok {
-		return nil, fmt.Errorf("No such environment found: %s", envName)
-	}
-	return env, nil
 }
 
 func (c *Config) WriteIfNotExist() error {
