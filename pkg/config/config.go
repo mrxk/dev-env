@@ -11,13 +11,6 @@ import (
 	"github.com/mrxk/dev-env/pkg/constants"
 )
 
-const (
-	ConfigDir  = ".dev-env"
-	ConfigFile = "dev-env.json"
-	DockerFile = "Dockerfile"
-	devEnvTag  = "dev_env"
-)
-
 type Config struct {
 	Version string          `json:"version"`
 	Envs    map[string]*Env `json:"envs"`
@@ -34,16 +27,39 @@ func NewConfig() (Config, error) {
 	c := Config{
 		Version: "1",
 		Envs: map[string]*Env{
-			constants.DefaultEnvironment: {
-				ContainerArgs:  constants.DefaultContainerArgs,
-				Name:           namesgenerator.GetRandomName(0),
-				Options:        map[string]string{},
-				dockerBuildDir: constants.DefaultEnvironment,
-			},
+			constants.DefaultEnvironment: NewEnv(constants.DefaultEnvironment),
 		},
 	}
 	err := c.Read()
 	return c, err
+}
+
+func NewConfigFor(name string) (Config, error) {
+	c := Config{
+		Version: "1",
+		Envs: map[string]*Env{
+			name: NewEnv(name),
+		},
+	}
+	err := c.Read()
+	return c, err
+}
+
+func NewEnv(name string) *Env {
+	return &Env{
+		ContainerArgs:  constants.DefaultContainerArgs,
+		Name:           namesgenerator.GetRandomName(0),
+		Options:        map[string]string{},
+		dockerBuildDir: name,
+	}
+}
+
+func (c *Config) AddEnvIfNotExistFor(name string) {
+	_, ok := c.Envs[name]
+	if ok {
+		return
+	}
+	c.Envs[name] = NewEnv(name)
 }
 
 func (c *Config) Read() error {
@@ -54,7 +70,7 @@ func (c *Config) Read() error {
 	if err != nil {
 		return err
 	}
-	configpaths, err := filepath.Glob(filepath.Join(configDir, "*", ConfigFile))
+	configpaths, err := filepath.Glob(filepath.Join(configDir, "*", constants.ConfigFile))
 	if err != nil {
 		return err
 	}
@@ -75,14 +91,6 @@ func (c *Config) Read() error {
 	return nil
 }
 
-func (c *Config) Write() error {
-	return c.write(true)
-}
-
-func (c *Config) WriteIfNotExist() error {
-	return c.write(false)
-}
-
 func (c *Config) EnvFor(envName string) (*Env, error) {
 	env, ok := c.Envs[envName]
 	if !ok {
@@ -91,35 +99,17 @@ func (c *Config) EnvFor(envName string) (*Env, error) {
 	return env, nil
 }
 
-func (c *Config) write(force bool) error {
-	configDir, err := GetConfigDir()
-	if err != nil {
-		return err
-	}
+func (c *Config) WriteIfNotExist() error {
 	for name, e := range c.Envs {
-		dirpath := filepath.Join(configDir, name)
-		err = os.MkdirAll(dirpath, 0700)
-		if err != nil {
-			continue
-		}
-		datapath := filepath.Join(dirpath, ConfigFile)
-		_, err = os.Stat(datapath)
-		if err == nil { // file exists
-			if !force { // if not forcing then done
-				continue
-			}
-		} else if !os.IsNotExist(err) {
-			return err
-		}
-		// either err == nil && force == true or err == NotExist
-		data, err := json.MarshalIndent(e, "", "    ")
+		content, err := json.MarshalIndent(e, "", "    ")
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(datapath, data, 0600)
-		if err != nil {
-			return err
-		}
+		writeConfigFileIfNotExist(name, constants.ConfigFile, content)
+		writeConfigFileIfNotExist(
+			e.dockerBuildDir,
+			constants.DockerFile,
+			[]byte(constants.DefaultDockerFile))
 
 	}
 	return nil
@@ -139,11 +129,11 @@ func (e *Env) DockerBuildDir() (string, error) {
 }
 
 func (e *Env) ImageNameAndTag() string {
-	return e.Name + ":" + devEnvTag
+	return e.Name + ":" + constants.DevEnvTag
 }
 
 func (e *Env) ContainerName() string {
-	return e.Name + "_" + devEnvTag
+	return e.Name + "_" + constants.DevEnvTag
 }
 
 func (e *Env) WithName(name string) *Env {
@@ -172,7 +162,7 @@ func GetConfigDir() (string, error) {
 	if err != nil {
 		return "", nil
 	}
-	configDir := filepath.Join(path, ConfigDir)
+	configDir := filepath.Join(path, constants.ConfigDir)
 	err = os.MkdirAll(configDir, 0700)
 	if err != nil {
 		return "", err
@@ -180,7 +170,32 @@ func GetConfigDir() (string, error) {
 	return configDir, nil
 }
 
-func WriteConfigFileIfNotExist(dir, filename string, content []byte) error {
+func GetProjectRoot() (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	candidatePath, err := filepath.Abs(cwd)
+	if err != nil {
+		return cwd, nil
+	}
+	candidatePath = filepath.Clean(candidatePath)
+	for {
+		candidateProjectRoot := filepath.Join(candidatePath, constants.ConfigDir)
+		_, err = os.Stat(candidateProjectRoot)
+		if err == nil {
+			return candidatePath, nil
+		}
+		parentPath := filepath.Dir(candidatePath)
+		if candidatePath == parentPath {
+			break
+		}
+		candidatePath = parentPath
+	}
+	return cwd, nil
+}
+
+func writeConfigFileIfNotExist(dir, filename string, content []byte) error {
 	configDir, err := GetConfigDir()
 	if err != nil {
 		return err
@@ -196,29 +211,4 @@ func WriteConfigFileIfNotExist(dir, filename string, content []byte) error {
 		return err
 	}
 	return ioutil.WriteFile(configFilePath, content, 0600)
-}
-
-func GetProjectRoot() (string, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	candidatePath, err := filepath.Abs(cwd)
-	if err != nil {
-		return cwd, nil
-	}
-	candidatePath = filepath.Clean(candidatePath)
-	for {
-		candidateProjectRoot := filepath.Join(candidatePath, ConfigDir)
-		_, err = os.Stat(candidateProjectRoot)
-		if err == nil {
-			return candidatePath, nil
-		}
-		parentPath := filepath.Dir(candidatePath)
-		if candidatePath == parentPath {
-			break
-		}
-		candidatePath = parentPath
-	}
-	return cwd, nil
 }

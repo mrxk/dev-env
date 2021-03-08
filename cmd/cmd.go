@@ -7,8 +7,8 @@ import (
 var rootCmd = &cobra.Command{
 	Short: "Manage a developement environment via docker in the current working directory.",
 	Use:   "dev-env",
-	PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
-		return Initialize(nil, nil)
+	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+		return Initialize(cmd, nil)
 	},
 }
 

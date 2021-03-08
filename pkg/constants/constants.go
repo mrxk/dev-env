@@ -2,6 +2,8 @@ package constants
 
 const (
 	AllType           = "all"
+	ConfigDir         = ".dev-env"
+	ConfigFile        = "dev-env.json"
 	ConnectType       = "connect"
 	DefaultDockerFile = `
 FROM debian:stretch
@@ -10,6 +12,8 @@ ENTRYPOINT ["/bin/bash"]
 `
 	DefaultEnvironment      = "main"
 	DetachedOption          = "detached"
+	DevEnvTag               = "dev_env"
+	DockerFile              = "Dockerfile"
 	EntrypointOption        = "--entrypoint"
 	EnvironmentOption       = "environment"
 	OutOfDateWarningsOption = "out-of-date-warnings"

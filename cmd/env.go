@@ -17,3 +17,11 @@ func envFromFlags(flags *pflag.FlagSet) (*config.Env, error) {
 	}
 	return cfg.EnvFor(envName)
 }
+
+func envNameFromFlags(flags *pflag.FlagSet) (string, error) {
+	envName, err := flags.GetString(constants.EnvironmentOption)
+	if err != nil {
+		return "", err
+	}
+	return envName, nil
+}
