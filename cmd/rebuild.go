@@ -8,13 +8,13 @@ import (
 )
 
 func Rebuild(cmd *cobra.Command, _ []string) error {
-	types, err := cmd.PersistentFlags().GetStringSlice(constants.TypeOption)
+	types, err := typesFromFlags(cmd.PersistentFlags())
 	if err != nil {
 		return err
 	}
 	for _, t := range types {
 		switch t {
-		case constants.AllType:
+		case constants.AllOption:
 			err = rebuildConnectImage(cmd)
 			if err != nil {
 				return err
@@ -24,11 +24,11 @@ func Rebuild(cmd *cobra.Command, _ []string) error {
 				return err
 			}
 			return rebuildSpawnImage(cmd)
-		case constants.ConnectType:
+		case constants.ConnectOption:
 			return rebuildConnectImage(cmd)
-		case constants.RunType:
+		case constants.RunOption:
 			return rebuildRunImage(cmd)
-		case constants.SpawnType:
+		case constants.SpawnOption:
 			return rebuildSpawnImage(cmd)
 		}
 	}
@@ -58,6 +58,10 @@ func rebuildSpawnImage(cmd *cobra.Command) error {
 		return err
 	}
 	spawnEnv := env.WithName(env.Name + constants.SpawnSuffix)
+	err = docker.StopContainer(spawnEnv)
+	if err != nil {
+		return err
+	}
 	return rebuildImage(spawnEnv)
 }
 

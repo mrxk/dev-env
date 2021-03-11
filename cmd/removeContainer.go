@@ -7,13 +7,13 @@ import (
 )
 
 func RemoveContainer(cmd *cobra.Command, _ []string) error {
-	types, err := cmd.PersistentFlags().GetStringSlice(constants.TypeOption)
+	types, err := typesFromFlags(cmd.PersistentFlags())
 	if err != nil {
 		return err
 	}
 	for _, t := range types {
 		switch t {
-		case constants.AllType:
+		case constants.AllOption:
 			err = removeConnectContainer(cmd)
 			if err != nil {
 				return err
@@ -23,11 +23,11 @@ func RemoveContainer(cmd *cobra.Command, _ []string) error {
 				return err
 			}
 			return removeSpawnContainer(cmd)
-		case constants.ConnectType:
+		case constants.ConnectOption:
 			return removeConnectContainer(cmd)
-		case constants.RunType:
+		case constants.RunOption:
 			return removeRunContainer(cmd)
-		case constants.SpawnType:
+		case constants.SpawnOption:
 			return removeSpawnContainer(cmd)
 		}
 	}

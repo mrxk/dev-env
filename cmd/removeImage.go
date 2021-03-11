@@ -8,13 +8,13 @@ import (
 )
 
 func RemoveImage(cmd *cobra.Command, _ []string) error {
-	types, err := cmd.PersistentFlags().GetStringSlice(constants.TypeOption)
+	types, err := typesFromFlags(cmd.PersistentFlags())
 	if err != nil {
 		return err
 	}
 	for _, t := range types {
 		switch t {
-		case constants.AllType:
+		case constants.AllOption:
 			err = removeConnectImage(cmd)
 			if err != nil {
 				return err
@@ -24,11 +24,11 @@ func RemoveImage(cmd *cobra.Command, _ []string) error {
 				return err
 			}
 			return removeSpawnImage(cmd)
-		case constants.ConnectType:
+		case constants.ConnectOption:
 			return removeConnectImage(cmd)
-		case constants.RunType:
+		case constants.RunOption:
 			return removeRunImage(cmd)
-		case constants.SpawnType:
+		case constants.SpawnOption:
 			return removeSpawnImage(cmd)
 		}
 	}

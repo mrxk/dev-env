@@ -29,16 +29,16 @@ Usage:
   dev-env [command]
 
 Available Commands:
-  connect     Start or connect to a dev-env container in the current directory
+  connect     Connect to a connect dev-env container in the current directory
   exec        Exec a command in a spawned dev-env container in the current directory
   help        Help about any command
   init        Initialize a dev-env in the current directory
   list        List containers and images in the current directory
-  rebuild     Rebuild a dev-env image in the current directory
-  rm          Remove a dev-env container in the current directory
-  rmi         Remove a dev-env container and its associated image in the current directory
-  run         Run a command via bash in a dev-env container in the current directory
-  spawn       Spawn a detached dev-env container in the current directory
+  rebuild     Rebuild dev-env images in the current directory
+  rm          Remove dev-env containers in the current directory
+  rmi         Remove dev-env containers and their associated images in the current directory
+  run         Run a command via bash in a run dev-env container in the current directory
+  spawn       Start a spawn dev-env container in the current directory
   stop        Stop a spawned dev-env container in the current directory
 
 Flags:
@@ -46,6 +46,167 @@ Flags:
   -h, --help                 help for dev-env
 
 Use "dev-env [command] --help" for more information about a command.
+```
+
+```text
+Connect to a connect dev-env container in the current directory
+
+Usage:
+  dev-env connect [flags]
+
+Flags:
+  -h, --help   help for connect
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Exec a command in a spawned dev-env container in the current directory
+
+Usage:
+  dev-env exec [flags]
+
+Flags:
+  -d, --detached   run command in the background
+  -h, --help       help for exec
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Help provides help for any command in the application.
+Simply type dev-env help [path to command] for full details.
+
+Usage:
+  dev-env help [command] [flags]
+
+Flags:
+  -h, --help   help for help
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Initialize a dev-env in the current directory
+
+Usage:
+  dev-env init [flags]
+
+Flags:
+  -h, --help   help for init
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+List containers and images in the current directory
+
+Usage:
+  dev-env list [flags]
+
+Aliases:
+  list, ls
+
+Flags:
+  -h, --help   help for list
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Rebuild dev-env images in the current directory
+
+Usage:
+  dev-env rebuild [flags]
+
+Flags:
+  -a, --all       rebuild all images
+  -c, --connect   rebuild connect image
+  -h, --help      help for rebuild
+  -r, --run       rebuild run image
+  -s, --spawn     rebuild spawn image
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Remove dev-env containers in the current directory
+
+Usage:
+  dev-env rm [flags]
+
+Flags:
+  -a, --all       remove all containers
+  -c, --connect   remove connect container
+  -h, --help      help for rm
+  -r, --run       remove run container
+  -s, --spawn     remove spawn container
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Remove dev-env containers and their associated images in the current directory
+
+Usage:
+  dev-env rmi [flags]
+
+Flags:
+  -a, --all       remove all images
+  -c, --connect   remove connect image
+  -h, --help      help for rmi
+  -r, --run       remove run image
+  -s, --spawn     remove spawn image
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Run a command via bash in a run dev-env container in the current directory
+
+Usage:
+  dev-env run [flags]
+
+Flags:
+  -d, --detached   run command in the background
+  -h, --help       help for run
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Start a spawn dev-env container in the current directory
+
+Usage:
+  dev-env spawn [flags]
+
+Flags:
+  -h, --help   help for spawn
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
+```
+
+```text
+Stop a spawned dev-env container in the current directory
+
+Usage:
+  dev-env stop [flags]
+
+Flags:
+  -h, --help   help for stop
+
+Global Flags:
+  -e, --environment string   environment to use (default "main")
 ```
 
 ## Configuration
@@ -110,10 +271,10 @@ managed by the `run` and `spawn`family of commands.
 The following commands work together to create an isolated environment for
 running a single command that is isolated from other command invocations.
 
- * `rebuild --type run`: Build a run dev-env image in the current directory
+ * `rebuild --run`: Build a run dev-env image in the current directory
  * `run`: Run a command via bash in a dev-env container in the current directory
- * `rm --type run`: Remove a run dev-env container in the current directory
- * `rmi --type run`: Remove a run dev-env container and its associated image in the current directory
+ * `rm --run`: Remove a run dev-env container in the current directory
+ * `rmi --run`: Remove a run dev-env container and its associated image in the current directory
 
 The `run` command creates an image from the given environment (if one does not
 already exist) and then destroys and re-creates a single use container for the
@@ -133,12 +294,12 @@ distinct from the one managed by the `connect` and `spawn`family of commands.
 The following commands work together to create a persistant environment for
 running single commands.
 
- * `rebuild --type spawn`: Build a spawn dev-env image in the current directory
+ * `rebuild --spawn`: Build a spawn dev-env image in the current directory
  * `spawn`: Spawn a detached dev-env container in the current directory
  * `exec`: Exec a command via bash in a spawned dev-env container in the current directory
  * `stop`: Stop a spawned dev-env container in the current directory
- * `rm --type spawn`: Remove a spawn dev-env container in the current directory
- * `rmi --type spawn`: Remove a spawn dev-env container and its associated image in the current directory
+ * `rm --spawn`: Remove a spawn dev-env container in the current directory
+ * `rmi --spawn`: Remove a spawn dev-env container and its associated image in the current directory
 
 The `spawn` command creates an image from the given environment (if one does
 not already exist) and then creates and starts a persistent container in the

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/mrxk/dev-env/pkg/constants"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +15,7 @@ var rootCmd = &cobra.Command{
 
 var connectCmd = &cobra.Command{
 	RunE:  Connect,
-	Short: "Start or connect to a dev-env container in the current directory",
+	Short: "Connect to a connect dev-env container in the current directory",
 	Use:   "connect",
 }
 
@@ -39,31 +40,31 @@ var listCmd = &cobra.Command{
 
 var rebuildCmd = &cobra.Command{
 	RunE:  Rebuild,
-	Short: "Rebuild a dev-env image in the current directory",
+	Short: "Rebuild dev-env images in the current directory",
 	Use:   "rebuild",
 }
 
 var removeContainerCmd = &cobra.Command{
 	RunE:  RemoveContainer,
-	Short: "Remove a dev-env container in the current directory",
+	Short: "Remove dev-env containers in the current directory",
 	Use:   "rm",
 }
 
 var removeImageCmd = &cobra.Command{
 	RunE:  RemoveImage,
-	Short: "Remove a dev-env container and its associated image in the current directory",
+	Short: "Remove dev-env containers and their associated images in the current directory",
 	Use:   "rmi",
 }
 
 var runCmd = &cobra.Command{
 	RunE:  Run,
-	Short: "Run a command via bash in a dev-env container in the current directory",
+	Short: "Run a command via bash in a run dev-env container in the current directory",
 	Use:   "run",
 }
 
 var spawnCmd = &cobra.Command{
 	RunE:  Spawn,
-	Short: "Spawn a detached dev-env container in the current directory",
+	Short: "Start a spawn dev-env container in the current directory",
 	Use:   "spawn",
 }
 
@@ -74,12 +75,27 @@ var stopCmd = &cobra.Command{
 }
 
 func Execute() error {
-	rebuildCmd.PersistentFlags().StringSliceP("type", "t", []string{"connect"}, "type of image to rebuild [all, connect, run, spawn]")
-	removeContainerCmd.PersistentFlags().StringSliceP("type", "t", []string{"connect"}, "type of image to rebuild [all, connect, run, spawn]")
-	removeImageCmd.PersistentFlags().StringSliceP("type", "t", []string{"connect"}, "type of image to rebuild [all, connect, run, spawn]")
-	execCmd.PersistentFlags().BoolP("detached", "d", false, "run command in the background")
-	runCmd.PersistentFlags().BoolP("detached", "d", false, "run command in the background")
-	rootCmd.PersistentFlags().StringP("environment", "e", "main", "environment to use")
+	rebuildCmd.PersistentFlags().BoolP(constants.AllOption, constants.AllShortOption, false, "rebuild all images")
+	rebuildCmd.PersistentFlags().BoolP(constants.ConnectOption, constants.ConnectShortOption, false, "rebuild connect image")
+	rebuildCmd.PersistentFlags().BoolP(constants.RunOption, constants.RunShortOption, false, "rebuild run image")
+	rebuildCmd.PersistentFlags().BoolP(constants.SpawnOption, constants.SpawnShortOption, false, "rebuild spawn image")
+
+	removeContainerCmd.PersistentFlags().BoolP(constants.AllOption, constants.AllShortOption, false, "remove all containers")
+	removeContainerCmd.PersistentFlags().BoolP(constants.ConnectOption, constants.ConnectShortOption, false, "remove connect container")
+	removeContainerCmd.PersistentFlags().BoolP(constants.RunOption, constants.RunShortOption, false, "remove run container")
+	removeContainerCmd.PersistentFlags().BoolP(constants.SpawnOption, constants.SpawnShortOption, false, "remove spawn container")
+
+	removeImageCmd.PersistentFlags().BoolP(constants.AllOption, constants.AllShortOption, false, "remove all images")
+	removeImageCmd.PersistentFlags().BoolP(constants.ConnectOption, constants.ConnectShortOption, false, "remove connect image")
+	removeImageCmd.PersistentFlags().BoolP(constants.RunOption, constants.RunShortOption, false, "remove run image")
+	removeImageCmd.PersistentFlags().BoolP(constants.SpawnOption, constants.SpawnShortOption, false, "remove spawn image")
+
+	execCmd.PersistentFlags().BoolP(constants.DetachedOption, constants.DetachedShortOption, false, "run command in the background")
+
+	runCmd.PersistentFlags().BoolP(constants.DetachedOption, constants.DetachedShortOption, false, "run command in the background")
+
+	rootCmd.PersistentFlags().StringP(constants.EnvironmentOption, constants.EnvironmentShortOption, "main", "environment to use")
+
 	rootCmd.AddCommand(connectCmd)
 	rootCmd.AddCommand(execCmd)
 	rootCmd.AddCommand(initCmd)
