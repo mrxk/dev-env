@@ -22,6 +22,8 @@ dev-env connect
 
 ## Usage
 
+### dev-env
+
 ```text
 Manage a developement environment via docker in the current working directory.
 
@@ -48,6 +50,8 @@ Flags:
 Use "dev-env [command] --help" for more information about a command.
 ```
 
+### dev-env connect
+
 ```text
 Connect to a connect dev-env container in the current directory
 
@@ -60,6 +64,8 @@ Flags:
 Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
+
+### dev-env exec
 
 ```text
 Exec a command in a spawned dev-env container in the current directory
@@ -75,6 +81,8 @@ Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
 
+### dev-env help
+
 ```text
 Help provides help for any command in the application.
 Simply type dev-env help [path to command] for full details.
@@ -89,6 +97,8 @@ Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
 
+### dev-env init
+
 ```text
 Initialize a dev-env in the current directory
 
@@ -101,6 +111,8 @@ Flags:
 Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
+
+### dev-env list
 
 ```text
 List containers and images in the current directory
@@ -117,6 +129,8 @@ Flags:
 Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
+
+### dev-env rebuild
 
 ```text
 Rebuild dev-env images in the current directory
@@ -135,6 +149,8 @@ Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
 
+### dev-env rm
+
 ```text
 Remove dev-env containers in the current directory
 
@@ -151,6 +167,8 @@ Flags:
 Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
+
+### dev-env rmi
 
 ```text
 Remove dev-env containers and their associated images in the current directory
@@ -169,6 +187,8 @@ Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
 
+### dev-env run
+
 ```text
 Run a command via bash in a run dev-env container in the current directory
 
@@ -183,6 +203,8 @@ Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
 
+### dev-env spawn
+
 ```text
 Start a spawn dev-env container in the current directory
 
@@ -195,6 +217,8 @@ Flags:
 Global Flags:
   -e, --environment string   environment to use (default "main")
 ```
+
+### dev-env stop
 
 ```text
 Stop a spawned dev-env container in the current directory
