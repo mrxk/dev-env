@@ -17,8 +17,8 @@ func List(cmd *cobra.Command, args []string) error {
 	names := cfg.EnvNames()
 	for _, name := range names {
 		env := cfg.Envs[name]
-		runEnv := env.WithName(env.Name + constants.RunSuffix)
-		spawnEnv := env.WithName(env.Name + constants.SpawnSuffix)
+		runEnv := env.WithName(env.Name() + constants.RunSuffix)
+		spawnEnv := env.WithName(env.Name() + constants.SpawnSuffix)
 		fmt.Printf("%s:\n", name)
 		listForEnv("connect", env)
 		listForEnv("run", runEnv)

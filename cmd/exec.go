@@ -15,7 +15,7 @@ func Exec(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name + constants.SpawnSuffix)
+	runEnv := env.WithName(env.Name() + constants.SpawnSuffix)
 	detached, err := cmd.PersistentFlags().GetBool(constants.DetachedOption)
 	if err != nil {
 		return err

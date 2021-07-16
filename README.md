@@ -236,13 +236,13 @@ Global Flags:
 ## Configuration
 
 Dev-env expects to find a `.dev-env` directory in the current working directory
-containing at least one directory. The name of that directory will be the name
-of the environment. Inside that directory must be a `dev-env.json` file and a
-`Dockerfile`. This directory is where `docker build` will be run to create the
-container. The `main` environment will be created with a default `Dockerfile`
-will be created if they do not exist. The resulting image must contain
-functional `bash` for the `run` command and a functional `tail` for the `spawn`
-command.
+or a parent directory containing at least one sub-directory.  The name of that
+sub-directory will be the name of the environment. Inside that directory must
+be a `dev-env.json` file and a `Dockerfile`. This directory is where `docker
+build` will be run to create the container. The `main` environment will be
+created with a default `Dockerfile` if they do not exist. The resulting image
+must contain functional `bash` in `$PATH` for the `run` command and a
+functional `tail` command in `$PATH` for the `spawn` command.
 
 The `dev-env.json` config file consists of a single top level object with the
 following fields.
@@ -250,7 +250,8 @@ following fields.
 | field | type | description |
 |-------|------|-------------|
 | containerArgs | string array | A list of arguments to pass to docker create. Dev-env replaces `${var}` or `$var` in each argument according to the values of the current environment variables. In addition `${PROJECTROOT}` or `$PROJECTROOT`is replaced with the parent directory of the `.dev-env` directory. Optional. |
-| name | string| The name of the container. Required. Init will create a name for the default `main` environment. |
+| name | string| The name of the container. Optional. If omitted, a sanitized version of the project directory will be used. |
+| options | map[string]string | A map of dev-env options. |
 
 ### Example config file
 
@@ -262,8 +263,15 @@ following fields.
         "-v", "${PROJECTROOT}:/src"
     ],
     "name": "nervous_golick"
+    "options": {
+	"skip-out-of-date-warnings": "true"
+    },
 }
 ```
+
+### Options
+
+* skip-out-of-date-warnings: Boolean. Default "false". When "true", a worning will be issued if the dev-env container is older than the Dockerfile.
 
 ## Details
 

@@ -91,7 +91,7 @@ func CreateContainer(env *config.Env, cmdArgs []string) error {
 		"--name",
 		containerName,
 	}
-	for _, containerArg := range env.ContainerArgs {
+	for _, containerArg := range env.ContainerArgs() {
 		expandedArg := os.Expand(containerArg, expand)
 		dockerArgs = append(dockerArgs, expandedArg)
 	}
@@ -228,7 +228,7 @@ func RemoveImage(env *config.Env) error {
 }
 
 func includeOutOfDateWarnings(env *config.Env) bool {
-	value, ok := env.Options[constants.OutOfDateWarningsOption]
+	value, ok := env.Options()[constants.OutOfDateWarningsOption]
 	if !ok {
 		return false
 	}

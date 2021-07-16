@@ -48,7 +48,7 @@ func rebuildRunImage(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name + constants.RunSuffix)
+	runEnv := env.WithName(env.Name() + constants.RunSuffix)
 	return rebuildImage(runEnv)
 }
 
@@ -57,7 +57,7 @@ func rebuildSpawnImage(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	spawnEnv := env.WithName(env.Name + constants.SpawnSuffix)
+	spawnEnv := env.WithName(env.Name() + constants.SpawnSuffix)
 	err = docker.StopContainer(spawnEnv)
 	if err != nil {
 		return err

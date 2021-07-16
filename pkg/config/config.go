@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/mrxk/dev-env/pkg/constants"
@@ -18,10 +19,14 @@ type Config struct {
 }
 
 type Env struct {
-	ContainerArgs  []string          `json:"containerArgs"`
-	Name           string            `json:"name"`
-	Options        map[string]string `json:"options"`
 	dockerBuildDir string
+	envData        envJSON
+}
+
+type envJSON struct {
+	ContainerArgs []string          `json:"containerArgs"`
+	Name          string            `json:"name"`
+	Options       map[string]string `json:"options"`
 }
 
 func NewConfig() (Config, error) {
@@ -48,19 +53,13 @@ func NewConfigFor(name string) (Config, error) {
 
 func NewEnv(name string) *Env {
 	return &Env{
-		ContainerArgs:  constants.DefaultContainerArgs,
-		Name:           namesgenerator.GetRandomName(0),
-		Options:        map[string]string{},
 		dockerBuildDir: name,
+		envData: envJSON{
+			ContainerArgs: constants.DefaultContainerArgs,
+			Name:          "",
+			Options:       map[string]string{},
+		},
 	}
-}
-
-func (c *Config) AddEnvIfNotExistFor(name string) {
-	_, ok := c.Envs[name]
-	if ok {
-		return
-	}
-	c.Envs[name] = NewEnv(name)
 }
 
 func (c *Config) EnvFor(envName string) (*Env, error) {
@@ -97,13 +96,16 @@ func (c *Config) Read() error {
 		if err != nil {
 			return err
 		}
-		e := Env{}
-		err = json.Unmarshal(data, &e)
+		envData := envJSON{}
+		err = json.Unmarshal(data, &envData)
 		if err != nil {
 			return err
 		}
 		name := filepath.Base(filepath.Dir(configpath))
-		e.dockerBuildDir = name
+		e := Env{
+			dockerBuildDir: name,
+			envData:        envData,
+		}
 		c.Envs[name] = &e
 	}
 	return nil
@@ -111,7 +113,7 @@ func (c *Config) Read() error {
 
 func (c *Config) WriteIfNotExist() error {
 	for name, e := range c.Envs {
-		content, err := json.MarshalIndent(e, "", "    ")
+		content, err := json.MarshalIndent(e.envData, "", "    ")
 		if err != nil {
 			return err
 		}
@@ -123,6 +125,22 @@ func (c *Config) WriteIfNotExist() error {
 
 	}
 	return nil
+}
+
+func (e *Env) Name() string {
+	if e.envData.Name != "" {
+		return e.envData.Name
+	}
+	e.envData.Name = generateName()
+	return e.envData.Name
+}
+
+func (e *Env) ContainerArgs() []string {
+	return e.envData.ContainerArgs
+}
+
+func (e *Env) Options() map[string]string {
+	return e.envData.Options
 }
 
 func (e *Env) DockerBuildDir() (string, error) {
@@ -139,31 +157,43 @@ func (e *Env) DockerBuildDir() (string, error) {
 }
 
 func (e *Env) ImageNameAndTag() string {
-	return e.Name + ":" + constants.DevEnvTag
+	return e.Name() + ":" + constants.DevEnvTag
 }
 
 func (e *Env) ContainerName() string {
-	return e.Name + "_" + constants.DevEnvTag
+	return e.Name() + "_" + constants.DevEnvTag
 }
 
 func (e *Env) WithName(name string) *Env {
 	newEnv := &Env{
-		ContainerArgs:  make([]string, len(e.ContainerArgs)),
-		Name:           name,
 		dockerBuildDir: e.dockerBuildDir,
+		envData: envJSON{
+			ContainerArgs: make([]string, len(e.ContainerArgs())),
+			Name:          name,
+			Options:       make(map[string]string),
+		},
 	}
-	copy(newEnv.ContainerArgs, e.ContainerArgs)
+	copy(newEnv.envData.ContainerArgs, e.ContainerArgs())
+	for k, v := range e.Options() {
+		newEnv.envData.Options[k] = v
+	}
 	return newEnv
 }
 
 func (e *Env) WithContainerArgs(containerArgs []string) *Env {
 	newEnv := &Env{
-		ContainerArgs:  make([]string, 0, len(e.ContainerArgs)+len(containerArgs)),
-		Name:           e.Name,
 		dockerBuildDir: e.dockerBuildDir,
+		envData: envJSON{
+			ContainerArgs: make([]string, 0, len(e.ContainerArgs())+len(containerArgs)),
+			Name:          e.Name(),
+			Options:       make(map[string]string),
+		},
 	}
-	newEnv.ContainerArgs = append(newEnv.ContainerArgs, e.ContainerArgs...)
-	newEnv.ContainerArgs = append(newEnv.ContainerArgs, containerArgs...)
+	newEnv.envData.ContainerArgs = append(newEnv.envData.ContainerArgs, e.ContainerArgs()...)
+	newEnv.envData.ContainerArgs = append(newEnv.envData.ContainerArgs, containerArgs...)
+	for k, v := range e.Options() {
+		newEnv.envData.Options[k] = v
+	}
 	return newEnv
 }
 
@@ -221,4 +251,20 @@ func writeConfigFileIfNotExist(dir, filename string, content []byte) error {
 		return err
 	}
 	return ioutil.WriteFile(configFilePath, content, 0600)
+}
+
+func generateName() string {
+	path, err := GetProjectRoot()
+	if err != nil {
+		return namesgenerator.GetRandomName(0)
+	}
+	return sanitizePath(path)
+}
+
+func sanitizePath(path string) string {
+	path = strings.ReplaceAll(path, string(os.PathSeparator), "_")
+	path = strings.ReplaceAll(path, string(":"), "_")
+	path = strings.Trim(path, "_")
+	path = strings.ToLower(path)
+	return path
 }

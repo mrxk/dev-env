@@ -11,6 +11,6 @@ func Stop(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	spawnEnv := env.WithName(env.Name + constants.SpawnSuffix)
+	spawnEnv := env.WithName(env.Name() + constants.SpawnSuffix)
 	return docker.StopContainer(spawnEnv)
 }

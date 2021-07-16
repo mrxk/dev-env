@@ -14,13 +14,13 @@ func Run(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name + constants.RunSuffix)
+	runEnv := env.WithName(env.Name() + constants.RunSuffix)
 	docker.WarnIfImageOutOfDate(runEnv)
 	err = docker.BuildImageIfNotExist(runEnv)
 	if err != nil {
 		return err
 	}
-	containerArgs := append(runEnv.ContainerArgs, constants.EntrypointOption, constants.RunShellCommand)
+	containerArgs := append(runEnv.ContainerArgs(), constants.EntrypointOption, constants.RunShellCommand)
 	runEnv = runEnv.WithContainerArgs(containerArgs)
 	cmdArgs := []string{constants.ShellCommandOption, fmt.Sprintf("%s", strings.Join(args, " "))}
 	err = docker.RecreateContainer(runEnv, cmdArgs)
