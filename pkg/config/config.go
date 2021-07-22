@@ -131,7 +131,7 @@ func (e *Env) Name() string {
 	if e.envData.Name != "" {
 		return e.envData.Name
 	}
-	e.envData.Name = generateName()
+	e.envData.Name = generateName(e.dockerBuildDir)
 	return e.envData.Name
 }
 
@@ -253,11 +253,12 @@ func writeConfigFileIfNotExist(dir, filename string, content []byte) error {
 	return ioutil.WriteFile(configFilePath, content, 0600)
 }
 
-func generateName() string {
+func generateName(prefix string) string {
 	path, err := GetProjectRoot()
 	if err != nil {
 		return namesgenerator.GetRandomName(0)
 	}
+	path = filepath.Join(prefix, path)
 	return sanitizePath(path)
 }
 
