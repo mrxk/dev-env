@@ -8,9 +8,9 @@ const (
 	ConnectOption      = "connect"
 	ConnectShortOption = "c"
 	DefaultDockerFile  = `
-FROM debian:stretch
+FROM alpine:latest
 LABEL creator=dev-env
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/ash"]
 `
 	DefaultEnvironment      = "main"
 	DetachedOption          = "detached"
