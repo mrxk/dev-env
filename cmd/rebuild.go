@@ -8,14 +8,23 @@ import (
 )
 
 func Rebuild(cmd *cobra.Command, _ []string) error {
-	types, err := typesFromFlags(cmd.PersistentFlags())
+	flags := cmd.PersistentFlags()
+	noCache, err := flags.GetBool(constants.NoCacheOption)
+	if err != nil {
+		return err
+	}
+	args := []string{}
+	if noCache {
+		args = append(args, "--no-cache")
+	}
+	types, err := typesFromFlags(flags)
 	if err != nil {
 		return err
 	}
 	for _, t := range types {
 		switch t {
 		case constants.AllOption:
-			err = rebuildConnectImage(cmd)
+			err = rebuildConnectImage(cmd, args...)
 			if err != nil {
 				return err
 			}
@@ -23,36 +32,36 @@ func Rebuild(cmd *cobra.Command, _ []string) error {
 			if err != nil {
 				return err
 			}
-			return rebuildSpawnImage(cmd)
+			return rebuildSpawnImage(cmd, args...)
 		case constants.ConnectOption:
-			return rebuildConnectImage(cmd)
+			return rebuildConnectImage(cmd, args...)
 		case constants.RunOption:
-			return rebuildRunImage(cmd)
+			return rebuildRunImage(cmd, args...)
 		case constants.SpawnOption:
-			return rebuildSpawnImage(cmd)
+			return rebuildSpawnImage(cmd, args...)
 		}
 	}
 	return nil
 }
 
-func rebuildConnectImage(cmd *cobra.Command) error {
+func rebuildConnectImage(cmd *cobra.Command, args ...string) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
-	return rebuildImage(env)
+	return rebuildImage(env, args...)
 }
 
-func rebuildRunImage(cmd *cobra.Command) error {
+func rebuildRunImage(cmd *cobra.Command, args ...string) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
 	}
 	runEnv := env.WithName(env.Name() + constants.RunSuffix)
-	return rebuildImage(runEnv)
+	return rebuildImage(runEnv, args...)
 }
 
-func rebuildSpawnImage(cmd *cobra.Command) error {
+func rebuildSpawnImage(cmd *cobra.Command, args ...string) error {
 	env, err := envFromFlags(cmd.Flags())
 	if err != nil {
 		return err
@@ -62,10 +71,10 @@ func rebuildSpawnImage(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	return rebuildImage(spawnEnv)
+	return rebuildImage(spawnEnv, args...)
 }
 
-func rebuildImage(env *config.Env) error {
+func rebuildImage(env *config.Env, args ...string) error {
 	err := docker.RemoveContainer(env)
 	if err != nil {
 		return err
@@ -74,5 +83,5 @@ func rebuildImage(env *config.Env) error {
 	if err != nil {
 		return err
 	}
-	return docker.BuildImage(env)
+	return docker.BuildImage(env, args...)
 }

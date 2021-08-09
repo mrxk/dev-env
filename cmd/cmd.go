@@ -79,6 +79,7 @@ func Execute() error {
 	rebuildCmd.PersistentFlags().BoolP(constants.ConnectOption, constants.ConnectShortOption, false, "rebuild connect image")
 	rebuildCmd.PersistentFlags().BoolP(constants.RunOption, constants.RunShortOption, false, "rebuild run image")
 	rebuildCmd.PersistentFlags().BoolP(constants.SpawnOption, constants.SpawnShortOption, false, "rebuild spawn image")
+	rebuildCmd.PersistentFlags().BoolP(constants.NoCacheOption, constants.NoCacheShortOption, false, "do not use cache when building")
 
 	removeContainerCmd.PersistentFlags().BoolP(constants.AllOption, constants.AllShortOption, false, "remove all containers")
 	removeContainerCmd.PersistentFlags().BoolP(constants.ConnectOption, constants.ConnectShortOption, false, "remove connect container")

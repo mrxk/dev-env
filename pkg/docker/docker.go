@@ -13,7 +13,7 @@ import (
 	"github.com/mrxk/dev-env/pkg/constants"
 )
 
-func BuildImage(env *config.Env) error {
+func BuildImage(env *config.Env, extraArgs ...string) error {
 	dockerConfigDir, err := env.DockerBuildDir()
 	if err != nil {
 		return err
@@ -24,6 +24,9 @@ func BuildImage(env *config.Env) error {
 		dockerConfigDir,
 		"-t",
 		imageNameAndTag,
+	}
+	for _, arg := range extraArgs {
+		dockerArgs = append(dockerArgs, arg)
 	}
 	fmt.Println(append([]string{"docker"}, dockerArgs...))
 	dockerCommand := exec.Command("docker", dockerArgs...)

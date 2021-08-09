@@ -20,6 +20,8 @@ ENTRYPOINT ["/bin/ash"]
 	EntrypointOption        = "--entrypoint"
 	EnvironmentOption       = "environment"
 	EnvironmentShortOption  = "e"
+	NoCacheOption           = "no-cache"
+	NoCacheShortOption      = "n"
 	OutOfDateWarningsOption = "out-of-date-warnings"
 	RunOption               = "run"
 	RunShellCommand         = "bash"
