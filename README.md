@@ -1,9 +1,8 @@
 # Dev-env
 
-Dev-env is a cli for managing a contanerized development environment with docker. It is
-inspired by the
-[Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/remote/containers)
-extension.
+Dev-env is a cli for managing a contanerized development environment with
+docker. It is inspired by the [Visual Studio Code Remote -
+Containers](https://code.visualstudio.com/docs/remote/containers) extension.
 
 ## Installation
 
@@ -258,20 +257,21 @@ following fields.
 ```json
 {
     "containerArgs": [
-	"--cpuset-cpus", "1,3",
-	"-v", "${HOME}/.ssh:/home/user/.ssh",
+        "--cpuset-cpus", "1,3",
+        "-v", "${HOME}/.ssh:/home/user/.ssh",
         "-v", "${PROJECTROOT}:/src"
     ],
-    "name": "nervous_golick"
+    "name": "nervous_golick",
     "options": {
-	"skip-out-of-date-warnings": "true"
-    },
+        "out-of-date-warnings": "true"
+    }
 }
 ```
 
 ### Options
 
-* skip-out-of-date-warnings: Boolean. Default "false". When "true", a worning will be issued if the dev-env container is older than the Dockerfile.
+* out-of-date-warnings: Boolean. Default "false". When "true", a worning
+  will be issued if the dev-env container is older than the Dockerfile.
 
 ## Details
 
