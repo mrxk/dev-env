@@ -37,6 +37,7 @@ func ExecContainer(env *config.Env, args []string, interactive bool) error {
 
 func simulateExec(name string, args ...string) error {
 	dockerCommand := exec.Command(name, args...)
+	dockerCommand.Stdin = os.Stdin
 	dockerCommand.Stdout = os.Stdout
 	dockerCommand.Stderr = os.Stderr
 	dockerCommand.Stdin = os.Stdin

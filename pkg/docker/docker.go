@@ -30,6 +30,7 @@ func BuildImage(env *config.Env, extraArgs ...string) error {
 	}
 	fmt.Println(append([]string{"docker"}, dockerArgs...))
 	dockerCommand := exec.Command("docker", dockerArgs...)
+	dockerCommand.Stdin = os.Stdin
 	dockerCommand.Stdout = os.Stdout
 	dockerCommand.Stderr = os.Stderr
 	err = dockerCommand.Start()
@@ -106,6 +107,7 @@ func CreateContainer(env *config.Env, cmdArgs []string) error {
 	}
 	fmt.Println(append([]string{"docker"}, dockerArgs...))
 	dockerCommand := exec.Command("docker", dockerArgs...)
+	dockerCommand.Stdin = os.Stdin
 	dockerCommand.Stdout = os.Stdout
 	dockerCommand.Stderr = os.Stderr
 	err := dockerCommand.Start()
@@ -193,6 +195,7 @@ func RemoveContainer(env *config.Env) error {
 	}
 	fmt.Println(append([]string{"docker"}, dockerArgs...))
 	dockerCommand := exec.Command("docker", dockerArgs...)
+	dockerCommand.Stdin = os.Stdin
 	dockerCommand.Stdout = os.Stdout
 	dockerCommand.Stderr = os.Stderr
 	err := dockerCommand.Start()
@@ -217,6 +220,7 @@ func RemoveImage(env *config.Env) error {
 	}
 	fmt.Println(append([]string{"docker"}, dockerArgs...))
 	dockerCommand := exec.Command("docker", dockerArgs...)
+	dockerCommand.Stdin = os.Stdin
 	dockerCommand.Stdout = os.Stdout
 	dockerCommand.Stderr = os.Stderr
 	err := dockerCommand.Start()
@@ -250,6 +254,7 @@ func SpawnContainer(env *config.Env) error {
 	}
 	fmt.Println(append([]string{"docker"}, dockerArgs...))
 	dockerCommand := exec.Command("docker", dockerArgs...)
+	dockerCommand.Stdin = os.Stdin
 	dockerCommand.Stdout = os.Stdout
 	dockerCommand.Stderr = os.Stderr
 	err := dockerCommand.Start()
@@ -277,6 +282,7 @@ func StopContainer(env *config.Env) error {
 	}
 	fmt.Println(append([]string{"docker"}, dockerArgs...))
 	dockerCommand := exec.Command("docker", dockerArgs...)
+	dockerCommand.Stdin = os.Stdin
 	dockerCommand.Stdout = os.Stdout
 	dockerCommand.Stderr = os.Stderr
 	err := dockerCommand.Start()
