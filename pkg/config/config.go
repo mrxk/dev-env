@@ -184,13 +184,11 @@ func (e *Env) WithContainerArgs(containerArgs []string) *Env {
 	newEnv := &Env{
 		dockerBuildDir: e.dockerBuildDir,
 		envData: envJSON{
-			ContainerArgs: make([]string, 0, len(e.ContainerArgs())+len(containerArgs)),
+			ContainerArgs: containerArgs,
 			Name:          e.Name(),
 			Options:       make(map[string]string),
 		},
 	}
-	newEnv.envData.ContainerArgs = append(newEnv.envData.ContainerArgs, e.ContainerArgs()...)
-	newEnv.envData.ContainerArgs = append(newEnv.envData.ContainerArgs, containerArgs...)
 	for k, v := range e.Options() {
 		newEnv.envData.Options[k] = v
 	}
