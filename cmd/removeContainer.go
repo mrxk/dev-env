@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/mrxk/dev-env/pkg/config"
 	"github.com/mrxk/dev-env/pkg/constants"
 	"github.com/mrxk/dev-env/pkg/docker"
 	"github.com/spf13/cobra"
@@ -39,7 +40,7 @@ func removeConnectContainer(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	return docker.RemoveContainer(env)
+	return removeContainer(env)
 }
 
 func removeRunContainer(cmd *cobra.Command) error {
@@ -47,12 +48,8 @@ func removeRunContainer(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	runEnv := env.WithName(env.Name() + constants.RunSuffix)
-	err = docker.StopContainer(runEnv)
-	if err != nil {
-		return err
-	}
-	return docker.RemoveContainer(runEnv)
+	env = env.WithName(env.Name() + constants.RunSuffix)
+	return removeContainer(env)
 }
 
 func removeSpawnContainer(cmd *cobra.Command) error {
@@ -60,10 +57,14 @@ func removeSpawnContainer(cmd *cobra.Command) error {
 	if err != nil {
 		return err
 	}
-	spawnEnv := env.WithName(env.Name() + constants.SpawnSuffix)
-	err = docker.StopContainer(spawnEnv)
+	env = env.WithName(env.Name() + constants.SpawnSuffix)
+	return removeContainer(env)
+}
+
+func removeContainer(env *config.Env) error {
+	err := docker.StopContainer(env)
 	if err != nil {
 		return err
 	}
-	return docker.RemoveContainer(spawnEnv)
+	return docker.RemoveContainer(env)
 }

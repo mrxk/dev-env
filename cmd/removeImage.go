@@ -57,15 +57,15 @@ func removeSpawnImage(cmd *cobra.Command) error {
 		return err
 	}
 	spawnEnv := env.WithName(env.Name() + constants.SpawnSuffix)
-	err = docker.StopContainer(spawnEnv)
-	if err != nil {
-		return err
-	}
 	return removeImage(spawnEnv)
 }
 
 func removeImage(env *config.Env) error {
-	err := docker.RemoveContainer(env)
+	err := docker.StopContainer(env)
+	if err != nil {
+		return err
+	}
+	err = docker.RemoveContainer(env)
 	if err != nil {
 		return err
 	}

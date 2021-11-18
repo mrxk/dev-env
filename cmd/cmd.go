@@ -11,6 +11,7 @@ var rootCmd = &cobra.Command{
 	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 		return Initialize(cmd, nil)
 	},
+	SilenceUsage: true,
 }
 
 var connectCmd = &cobra.Command{
