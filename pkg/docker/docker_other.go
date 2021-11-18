@@ -47,3 +47,7 @@ func ExecContainer(env *config.Env, args []string, interactive bool) error {
 	fmt.Println(dockerArgs)
 	return syscall.Exec(dockerBinary, dockerArgs, os.Environ())
 }
+
+func dockerSocket() string {
+	return "/var/run/docker.sock"
+}

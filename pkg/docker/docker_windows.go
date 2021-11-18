@@ -55,3 +55,7 @@ func simulateExec(name string, args ...string) error {
 	os.Exit(0)
 	return nil
 }
+
+func dockerSocket() string {
+	return "//var/run/docker.sock"
+}

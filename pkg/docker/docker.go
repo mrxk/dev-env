@@ -144,6 +144,8 @@ func DockerFileModTime(env *config.Env) (time.Time, error) {
 func expand(name string) string {
 	normalizedName := strings.ToUpper(name)
 	switch normalizedName {
+	case "DOCKERSOCK":
+		return dockerSocket()
 	case "PROJECTROOT":
 		root, err := config.GetProjectRoot()
 		if err == nil {
