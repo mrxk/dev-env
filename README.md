@@ -248,9 +248,21 @@ following fields.
 
 | field | type | description |
 |-------|------|-------------|
-| containerArgs | string array | A list of arguments to pass to docker create. Dev-env replaces `${var}` or `$var` in each argument according to the values of the current environment variables. In addition `${PROJECTROOT}` or `$PROJECTROOT`is replaced with the parent directory of the `.dev-env` directory. Optional. |
-| name | string| The name of the container. Optional. If omitted, a sanitized version of the project directory will be used. |
-| options | map[string]string | A map of dev-env options. |
+| `containerArgs` | []string | A list of arguments to pass to docker create. Optional. |
+| `name` | string | The name of the container. Optional. If omitted, a sanitized version of the project directory will be used. |
+| `options` | map[string]string | A map of dev-env options. |
+
+### Replacement tokens in containerArgs 
+
+Dev-env replaces `${var}` or `$var` in each string in `containerArgs` according
+to the values of the current environment variables. References to undefined
+variables are replaced by the empty string.  In addition, the following
+variables are replaced by dev-env itself.
+
+| name | replacement |
+|------|-------------|
+| `PROJECTROOT` | The parent directory of the `.dev-env` directory |
+| `DOCKERSOCK`  | The platform specific path to the local docker socket file |
 
 ### Example config file
 
@@ -259,7 +271,8 @@ following fields.
     "containerArgs": [
         "--cpuset-cpus", "1,3",
         "-v", "${HOME}/.ssh:/home/user/.ssh",
-        "-v", "${PROJECTROOT}:/src"
+        "-v", "${PROJECTROOT}:/src",
+        "-v", "${DOCKERSOCK}:/var/run/docker.sock"
     ],
     "name": "nervous_golick",
     "options": {
@@ -270,7 +283,7 @@ following fields.
 
 ### Options
 
-* out-of-date-warnings: Boolean. Default "false". When "true", a worning
+* out-of-date-warnings: Boolean. Default "false". When "true", a warning
   will be issued if the dev-env container is older than the Dockerfile.
 
 ## Details
