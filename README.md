@@ -38,7 +38,7 @@ Available Commands:
   rebuild     Rebuild dev-env images in the current directory
   rm          Remove dev-env containers in the current directory
   rmi         Remove dev-env containers and their associated images in the current directory
-  run         Run a command via bash in a run dev-env container in the current directory
+  run         Run a command via sh in a run dev-env container in the current directory
   spawn       Start a spawn dev-env container in the current directory
   stop        Stop a spawned dev-env container in the current directory
 
@@ -189,7 +189,7 @@ Global Flags:
 ### dev-env run
 
 ```text
-Run a command via bash in a run dev-env container in the current directory
+Run a command via sh in a run dev-env container in the current directory
 
 Usage:
   dev-env run [flags]
@@ -240,8 +240,8 @@ sub-directory will be the name of the environment. Inside that directory must
 be a `dev-env.json` file and a `Dockerfile`. This directory is where `docker
 build` will be run to create the container. The `main` environment will be
 created with a default `Dockerfile` if they do not exist. The resulting image
-must contain functional `bash` in `$PATH` for the `run` command and a
-functional `tail` command in `$PATH` for the `spawn` command.
+must contain functional `sh` in `$PATH` for the `run` command and a functional
+`tail` command in `$PATH` for the `spawn` command.
 
 The `dev-env.json` config file consists of a single top level object with the
 following fields.
@@ -317,14 +317,14 @@ The following commands work together to create an isolated environment for
 running a single command that is isolated from other command invocations.
 
  * `rebuild --run`: Build a run dev-env image in the current directory
- * `run`: Run a command via bash in a dev-env container in the current directory
+ * `run`: Run a command via sh in a dev-env container in the current directory
  * `rm --run`: Remove a run dev-env container in the current directory
  * `rmi --run`: Remove a run dev-env container and its associated image in the current directory
 
 The `run` command creates an image from the given environment (if one does not
 already exist) and then destroys and re-creates a single use container for the
-execution of a single command. The image is assumed to contain `bash` and the
-arguments passed to the `run` command will be passed to `bash -c` in the
+execution of a single command. The image is assumed to contain `sh` and the
+arguments passed to the `run` command will be passed to `sh -c` in the
 container. If the arguments themselves contain flags then separate the entire
 command with double dashes `--`. For example, `dev-env run -- ls -la /`. This
 container and image can be destroyed with the `rmr` and `rmri` commands. If
@@ -341,7 +341,7 @@ running single commands.
 
  * `rebuild --spawn`: Build a spawn dev-env image in the current directory
  * `spawn`: Spawn a detached dev-env container in the current directory
- * `exec`: Exec a command via bash in a spawned dev-env container in the current directory
+ * `exec`: Exec a command in a spawned dev-env container in the current directory
  * `stop`: Stop a spawned dev-env container in the current directory
  * `rm --spawn`: Remove a spawn dev-env container in the current directory
  * `rmi --spawn`: Remove a spawn dev-env container and its associated image in the current directory

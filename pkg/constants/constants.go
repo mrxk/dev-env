@@ -24,7 +24,7 @@ ENTRYPOINT ["/bin/ash"]
 	NoCacheShortOption      = "n"
 	OutOfDateWarningsOption = "out-of-date-warnings"
 	RunOption               = "run"
-	RunShellCommand         = "bash"
+	RunShellCommand         = "sh"
 	RunShortOption          = "r"
 	RunSuffix               = "_run"
 	ShellCommandOption      = "-c"
