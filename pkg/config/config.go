@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -257,13 +258,15 @@ func generateName(prefix string) string {
 		return namesgenerator.GetRandomName(0)
 	}
 	path = filepath.Join(prefix, path)
-	return sanitizePath(path)
+	return sanitizeTag(path)
 }
 
-func sanitizePath(path string) string {
-	path = strings.ReplaceAll(path, string(os.PathSeparator), "_")
-	path = strings.ReplaceAll(path, string(":"), "_")
-	path = strings.Trim(path, "_")
-	path = strings.ToLower(path)
-	return path
+// https://docs.docker.com/engine/reference/commandline/tag/
+// Name components may contain lowercase letters, digits and separators. A
+// separator is defined as a period, one or two underscores, or one or more
+// dashes. A name component may not start or end with a separator.
+func sanitizeTag(path string) string {
+	tag := strings.ToLower(path)
+	re := regexp.MustCompile(`[^a-z0-9_.-]`)
+	return re.ReplaceAllString(tag, "_")
 }
