@@ -258,15 +258,18 @@ func generateName(prefix string) string {
 		return namesgenerator.GetRandomName(0)
 	}
 	path = filepath.Join(prefix, path)
-	return sanitizeTag(path)
+	return sanitizePath(path)
 }
 
 // https://docs.docker.com/engine/reference/commandline/tag/
 // Name components may contain lowercase letters, digits and separators. A
 // separator is defined as a period, one or two underscores, or one or more
 // dashes. A name component may not start or end with a separator.
-func sanitizeTag(path string) string {
+func sanitizePath(path string) string {
 	tag := strings.ToLower(path)
-	re := regexp.MustCompile(`[^a-z0-9_.-]`)
-	return re.ReplaceAllString(tag, "_")
+	re1 := regexp.MustCompile(`[^a-z0-9_.-]`)
+	tag = re1.ReplaceAllString(tag, "-")
+	re2 := regexp.MustCompile(`(__+|\.\.+|--+)`)
+	tag = re2.ReplaceAllString(tag, "-")
+	return tag
 }
